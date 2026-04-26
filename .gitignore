@@ -1,0 +1,7 @@
+*.log
+*.tmp
+*.html
+*.bak
+LOGS/
+LOG/
+Smart/
