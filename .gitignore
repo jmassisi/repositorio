@@ -3,6 +3,12 @@ repositorio.ps1
 *.tmp
 *.html
 *.bak
+*.bin
+*.mdmp
+*.dat
+*.csv
 LOGS/
 LOG/
 Smart/
+Data/
+temp_ccupdate/
