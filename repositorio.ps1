@@ -7,3 +7,5 @@ Remove-Item (Get-PSReadLineOption).HistorySavePath -EA 0;Clear-History
 Write-Host "Listo. Presione cualquier tecla para cerrar y abrir la carpeta..." -ForegroundColor Green
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 Start-Process explorer.exe $d
+
+exit
