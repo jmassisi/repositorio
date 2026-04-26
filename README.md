@@ -1,9 +1,24 @@
-# Toolkit Técnico
+# Toolkit Técnico - iGeek
 
-Repositorio privado centralizado con herramientas de diagnóstico, scripts de automatización y configuraciones de sistema (Windows).
+Repositorio centralizado de herramientas, scripts y configuraciones para soporte técnico Windows.
 
-## Estrategia de Despliegue
-Diseñado para ser descargado en equipos de terceros mediante un script lanzador de PowerShell ("One-Liner"). 
-* Utiliza un Token de Acceso Personal (PAT) de solo lectura.
-* Se descarga y extrae en entorno temporal.
-* Borra rastros de historial de comandos y caché al finalizar.
+## Despliegue en equipo cliente
+
+Abrir PowerShell y ejecutar:
+irm repositorio.igeek.ar | iex
+
+Se descarga en C:\repositorio, limpia rastros al finalizar y abre la carpeta.
+
+## Estructura
+
+scripts/sistema    → Scripts de optimización y configuración del sistema
+scripts/drivers    → Backup y restauración de drivers
+scripts/anydesk    → Reset de ID y licencia de AnyDesk
+registro           → Tweaks de registro (.reg)
+GLPI               → Agente y script de inventario forzado
+Zabbix             → Agente y configuración de monitoreo
+
+## Gestión
+
+Cualquier actualización se refleja automáticamente en el próximo despliegue.
+Para subir cambios: git add . && git commit -m "descripcion" && git push
