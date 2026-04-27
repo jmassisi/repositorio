@@ -32,7 +32,8 @@ if %errorlevel% neq 0 (
 )
 
 echo Descargando %MSI_NAME% desde GitHub...
-curl -L --fail --silent --show-error "%DOWNLOAD_URL%" -o "%MSI_FILE%"
+::curl -L --fail --silent --show-error "%DOWNLOAD_URL%" -o "%MSI_FILE%"
+curl -L --fail --silent --show-error --ssl-no-revoke "%DOWNLOAD_URL%" -o "%MSI_FILE%"
 if %errorlevel% neq 0 (
     echo [ERROR] No se pudo descargar el instalador.
     echo URL: %DOWNLOAD_URL%
