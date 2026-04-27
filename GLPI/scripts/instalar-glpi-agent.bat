@@ -10,7 +10,7 @@
 ::    - Ejecutar como Administrador
 ::    - Acceso a internet (github.com)
 :: ============================================================
-::  Version: 1.2  (2026-04-27)
+::  Version: 1.4  (2026-04-27)
 ::
 ::  TODO: Reemplazar version fija por consulta dinamica a la API de
 ::        GitHub Releases, validando compatibilidad con la version
@@ -56,14 +56,16 @@ msiexec /i "%MSI_FILE%" /quiet /norestart ^
 set INSTALL_CODE=%errorlevel%
 del /f /q "%MSI_FILE%" >nul 2>&1
 
-if %INSTALL_CODE% equ 0 (
-    echo [OK] Instalacion completada correctamente.
-    echo El agente reportara al servidor en los proximos minutos.
-    echo Entidad asignada: Staging (pendiente de clasificacion)
-) else (
-    echo [ERROR] La instalacion fallo con codigo: %INSTALL_CODE%
-    echo Revise el log en: C:\Windows\Temp\glpi-agent-install.log
-)
+if %INSTALL_CODE% equ 0 goto ok
+echo [ERROR] La instalacion fallo con codigo: %INSTALL_CODE%
+echo Revise el log en: C:\Windows\Temp\glpi-agent-install.log
+goto fin
 
+:ok
+echo [OK] Instalacion completada correctamente.
+echo El agente reportara al servidor en los proximos minutos.
+echo Entidad asignada: Staging (pendiente de clasificacion)
+
+:fin
 echo.
 pause
