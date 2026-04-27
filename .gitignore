@@ -9,6 +9,7 @@ repositorio.ps1
 *.csv
 LOGS/
 LOG/
+logs/
 Smart/
 Data/
 temp_ccupdate/
