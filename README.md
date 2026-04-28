@@ -16,11 +16,13 @@ Se descarga en `C:\repositorio`, limpia rastros al finalizar y abre la carpeta.
 
 | Carpeta | Contenido |
 |---|---|
+| `anydesk/scripts` | Reset de ID y configuración de AnyDesk |
+| `anydesk/docs` | Documentación del reset de AnyDesk |
 | `scripts/sistema` | Scripts de optimización y configuración del sistema |
 | `scripts/drivers` | Backup y restauración de drivers |
-| `scripts/anydesk` | Reset de ID y licencia de AnyDesk |
 | `registro` | Tweaks de registro (.reg) |
-| `GLPI` | Agente y script de inventario forzado |
+| `GLPI/scripts` | Agente y script de inventario forzado |
+| `GLPI/docs` | Documentación del agente GLPI |
 | `Zabbix` | Agente y configuración de monitoreo |
 
 ## Gestión
