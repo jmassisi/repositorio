@@ -1,15 +1,17 @@
-# Reset-AnyDesk.ps1 - v2
+# Reset-AnyDesk.ps1 - v3
 # Agnostico de idioma, path, instalado o standalone
+# - Deteccion por ProductName (no por nombre del proceso)
+# - Relaunch: Start-Service si instalado, Start-Process si standalone
 # - Backup de .conf con timestamp (sin sobreescribir historial)
-# - Log persistente por ejecucion
+# - Log en C:\repositorio\anydesk\logs\
 
 #Requires -RunAsAdministrator
 
-$ErrorActionPreference = 'Continue'
+$ErrorActionPreference = 'Stop'
 
 # ── Timestamp unico para esta ejecucion ──────────────────────
-$ts     = Get-Date -Format 'yyyy-MM-dd_HHmmss'
-$logDir = "$env:ProgramData\AnyDesk\reset-logs"
+$ts      = Get-Date -Format 'yyyy-MM-dd_HHmmss'
+$logDir  = "$PSScriptRoot\..\logs"
 $logFile = "$logDir\reset_$ts.log"
 
 if (-not (Test-Path $logDir)) { New-Item $logDir -ItemType Directory -Force | Out-Null }
@@ -35,146 +37,59 @@ Add-Content -Path $logFile -Value " Host   : $env:COMPUTERNAME"                 
 Add-Content -Path $logFile -Value " Usuario: $env:USERDOMAIN\$env:USERNAME"          -Encoding UTF8
 Add-Content -Path $logFile -Value "================================================" -Encoding UTF8
 
-# ── Funcion: decodificar ROT13 ───────────────────────────────
-function ConvertFrom-Rot13 ([string]$s) {
-    -join ($s.ToCharArray() | ForEach-Object {
-        $c = [int]$_
-        if    ($c -ge 65 -and $c -le 90)  { [char](( ($c - 65 + 13) % 26 ) + 65) }
-        elseif($c -ge 97 -and $c -le 122) { [char](( ($c - 97 + 13) % 26 ) + 97) }
-        else  { $_ }
-    })
-}
-
-# ── Funcion: buscar exe via UserAssist ───────────────────────
-function Find-ExeViaUserAssist {
-    Write-Log "Buscando ruta via UserAssist (ROT13)..."
-    $uaRoot = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist'
-    try {
-        $guids = Get-ChildItem $uaRoot -ErrorAction Stop
-        foreach ($guid in $guids) {
-            $countKey = Join-Path $guid.PSPath 'Count'
-            if (-not (Test-Path $countKey)) { continue }
-            $names = Get-Item $countKey | Select-Object -ExpandProperty Property
-            foreach ($name in $names) {
-                $decoded = ConvertFrom-Rot13 $name
-                if ($decoded -match 'AnyDesk\.exe$') {
-                    Write-Log "UserAssist hit: $decoded"
-                    return $decoded
-                }
-            }
-        }
-        Write-Log "UserAssist: no se encontro AnyDesk.exe" 'WARN'
-    } catch {
-        Write-Log "UserAssist: error leyendo registro - $_" 'WARN'
-    }
-    return $null
-}
-
-# ── Funcion: buscar exe via Prefetch ─────────────────────────
-function Find-ExeViaPrefetch {
-    Write-Log "Buscando ruta via Prefetch..."
-    $prefetchDir = "$env:SystemRoot\Prefetch"
-    try {
-        $pf = Get-ChildItem "$prefetchDir\ANYDESK*.pf" -ErrorAction Stop | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-        if ($pf) {
-            Write-Log "Prefetch encontrado: $($pf.FullName) (ultima ejecucion: $($pf.LastWriteTime))"
-            # Prefetch no contiene la ruta completa de forma facil de leer sin herramientas forenses,
-            # pero confirma ejecucion. Intentar reconstruir ruta desde strings del archivo.
-            $bytes  = [System.IO.File]::ReadAllBytes($pf.FullName)
-            $text   = [System.Text.Encoding]::Unicode.GetString($bytes)
-            $match  = [regex]::Match($text, '[A-Z]:\\[^\x00]+AnyDesk\.exe')
-            if ($match.Success) {
-                $path = $match.Value.Trim()
-                Write-Log "Prefetch ruta extraida: $path"
-                return $path
-            } else {
-                Write-Log "Prefetch: no se pudo extraer ruta del exe" 'WARN'
-            }
-        } else {
-            Write-Log "Prefetch: no se encontro archivo ANYDESK*.pf" 'WARN'
-        }
-    } catch {
-        Write-Log "Prefetch: error leyendo directorio - $_" 'WARN'
-    }
-    return $null
-}
-
 # ── 1. Detectar proceso ──────────────────────────────────────
 Write-Step 1 $totalSteps "Buscando proceso AnyDesk..."
 
-$proc      = Get-Process -Name AnyDesk -ErrorAction SilentlyContinue | Select-Object -First 1
+# Buscar por ProductName para ser agnóstico al nombre del exe
+$proc = Get-Process -ErrorAction SilentlyContinue | Where-Object {
+    try { $_.MainModule.FileVersionInfo.ProductName -like '*AnyDesk*' } catch { $false }
+} | Select-Object -First 1
+
 $exePath   = $null
 $anyDeskId = $null
-$detectedVia = $null
 
-# 1a. Proceso activo
 if ($proc) {
     try {
-        $exePath = (Get-Process -Id $proc.Id -FileVersionInfo -ErrorAction Stop).FileName
+        $exePath = $proc.MainModule.FileName
     } catch {
         $exePath = (Get-WmiObject Win32_Process -Filter "ProcessId=$($proc.Id)").ExecutablePath
     }
-    $detectedVia = 'PROCESO'
-    Write-Log "Proceso activo - PID: $($proc.Id)"
+    Write-Log "Proceso activo - PID: $($proc.Id) | Nombre: $($proc.Name)"
     Write-Log "Ruta exe: $exePath"
+
+    # Leer AnyDesk ID desde system.conf ANTES de matar el proceso
+    $systemConf = "$env:ProgramData\AnyDesk\system.conf"
+    if (-not (Test-Path $systemConf)) {
+        $systemConf = "$(Split-Path $exePath -Parent)\system.conf"
+    }
+    if (Test-Path $systemConf) {
+        $idLine = Get-Content $systemConf -ErrorAction SilentlyContinue |
+                  Where-Object { $_ -match 'ad\.anynet\.id\s*=' }
+        if ($idLine) {
+            $anyDeskId = ($idLine -split '=', 2)[1].Trim()
+            Write-Log "AnyDesk ID (antes del reset): $anyDeskId"
+        }
+    }
+    if (-not $anyDeskId) { Write-Log "AnyDesk ID: no encontrado en system.conf" 'WARN' }
+
 } else {
-    Write-Log "AnyDesk no estaba corriendo."
+    Write-Log "AnyDesk no estaba corriendo - buscando instalacion..."
 }
 
-# 1b. Instalacion en ProgramFiles
+# Fallback: buscar instalacion en ProgramFiles
 if (-not $exePath) {
-    Write-Log "Buscando instalacion en ProgramFiles..."
     foreach ($c in @("$env:ProgramFiles\AnyDesk\AnyDesk.exe", "${env:ProgramFiles(x86)}\AnyDesk\AnyDesk.exe")) {
-        if (Test-Path $c) { $exePath = $c; $detectedVia = 'PROGRAMFILES'; break }
+        if (Test-Path $c) { $exePath = $c; break }
     }
-    if ($exePath) { Write-Log "Instalacion encontrada: $exePath" }
-    else          { Write-Log "No encontrado en ProgramFiles." 'WARN' }
 }
 
-# 1c. UserAssist
 if (-not $exePath) {
-    $exePath = Find-ExeViaUserAssist
-    if ($exePath) { $detectedVia = 'USERASSIST' }
-}
-
-# 1d. Prefetch
-if (-not $exePath) {
-    $exePath = Find-ExeViaPrefetch
-    if ($exePath) { $detectedVia = 'PREFETCH' }
-}
-
-# Validar que el exe existe fisicamente
-if ($exePath) {
-    if (Test-Path $exePath) {
-        Write-Log "Exe validado via $detectedVia : $exePath"
-    } else {
-        Write-Log "Ruta encontrada via $detectedVia pero el exe ya no existe: $exePath" 'ERROR'
-        Write-Log "Abortando para evitar reset sin posibilidad de relaunch." 'ERROR'
-        exit 1
-    }
-} else {
-    Write-Log "No se encontro AnyDesk por ningun metodo (proceso, ProgramFiles, UserAssist, Prefetch)." 'ERROR'
-    Write-Log "Coloca este script en el mismo directorio que AnyDesk.exe y volvelo a ejecutar." 'ERROR'
+    Write-Log "No se encontro AnyDesk instalado ni corriendo." 'ERROR'
+    Write-Host "`n   Coloca este script en el mismo directorio que AnyDesk.exe y volvelo a ejecutar."
     exit 1
 }
 
 $exeDir = Split-Path $exePath -Parent
-
-# Leer AnyDesk ID ANTES del kill (ahora siempre, independiente de si habia proceso)
-$systemConf = "$env:ProgramData\AnyDesk\system.conf"
-if (-not (Test-Path $systemConf)) { $systemConf = "$exeDir\system.conf" }
-if (Test-Path $systemConf) {
-    $idLine = Get-Content $systemConf -ErrorAction SilentlyContinue |
-              Where-Object { $_ -match 'ad\.anynet\.id\s*=' }
-    if ($idLine) {
-        $anyDeskId = ($idLine -split '=', 2)[1].Trim()
-        Write-Log "AnyDesk ID (antes del reset): $anyDeskId"
-    } else {
-        Write-Log "AnyDesk ID: no encontrado en system.conf" 'WARN'
-    }
-} else {
-    Write-Log "AnyDesk ID: system.conf no encontrado" 'WARN'
-}
 
 # Version del exe
 try {
@@ -193,13 +108,29 @@ Write-Log "Tipo: $tipoStr"
 # ── 2. Kill ──────────────────────────────────────────────────
 Write-Step 2 $totalSteps "Terminando procesos AnyDesk..."
 
-Get-Process -Name AnyDesk -ErrorAction SilentlyContinue | ForEach-Object {
+# Matar todos los procesos con ProductName AnyDesk
+Get-Process -ErrorAction SilentlyContinue | Where-Object {
+    try { $_.MainModule.FileVersionInfo.ProductName -like '*AnyDesk*' } catch { $false }
+} | ForEach-Object {
     $_ | Stop-Process -Force
     Write-Log "Terminado PID $($_.Id)"
 }
 
+# Si instalado, detener tambien el servicio
+if ($isInstalled) {
+    $svc = Get-Service -Name 'AnyDesk' -ErrorAction SilentlyContinue
+    if ($svc -and $svc.Status -ne 'Stopped') {
+        Stop-Service -Name 'AnyDesk' -Force -ErrorAction SilentlyContinue
+        Write-Log "Servicio AnyDesk detenido"
+    }
+}
+
 $waited = 0
-while ((Get-Process -Name AnyDesk -ErrorAction SilentlyContinue) -and $waited -lt 5) {
+while (
+    (Get-Process -ErrorAction SilentlyContinue | Where-Object {
+        try { $_.MainModule.FileVersionInfo.ProductName -like '*AnyDesk*' } catch { $false }
+    }) -and $waited -lt 5
+) {
     Start-Sleep -Seconds 1
     $waited++
 }
@@ -240,8 +171,15 @@ Write-Log "$resetCount archivo(s) reseteado(s)"
 Write-Step 4 $totalSteps "Relanzando AnyDesk..."
 
 try {
-    Start-Process $exePath
-    Write-Log "Relaunch OK: $exePath"
+    if ($isInstalled) {
+        Start-Service -Name 'AnyDesk' -ErrorAction Stop
+        Write-Log "Servicio AnyDesk iniciado"
+        Start-Process $exePath
+        Write-Log "Relaunch OK (instalado): $exePath"
+    } else {
+        Start-Process $exePath
+        Write-Log "Relaunch OK (standalone): $exePath"
+    }
 } catch {
     Write-Log "Relaunch FALLIDO: $_" 'ERROR'
 }
