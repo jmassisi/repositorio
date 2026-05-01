@@ -1,5 +1,10 @@
 $d="C:\repositorio";$z="$env:TEMP\r.zip"
-if (Test-Path $d) { Rename-Item $d "C:\repositorio_OLD" -Force }
+if (Test-Path $d) { 
+    $shell = New-Object -ComObject Shell.Application
+    $shell.Windows() | Where-Object {$_.LocationURL -like "*repositorio*"} | ForEach-Object {$_.Quit()}
+    Start-Sleep -Seconds 1
+    Rename-Item $d "C:\repositorio_OLD" -Force 
+}
 irm https://github.com/jmassisi/repositorio/archive/refs/heads/main.zip -OutFile $z
 Expand-Archive $z $env:TEMP\rextract -Force
 Move-Item "$env:TEMP\rextract\repositorio-main" $d -Force

@@ -1,6 +1,6 @@
 # Instalación del Agente GLPI en Windows
 
-**Versión del documento:** 1.1  
+**Versión del documento:** 2.0  
 **GLPI Server:** https://soporte.igeek.ar  
 **Versión GLPI:** 11.0.6  
 **Versión agente:** 1.17  
@@ -16,15 +16,38 @@
 
 ---
 
-## Método 1 — Instalación silenciosa con script (recomendada)
+## Archivos
 
-1. Descargar el script `instalar-glpi-agent.bat` desde el repositorio interno.
-2. Ejecutar con clic derecho → **Ejecutar como administrador**.
+| Archivo | Descripción |
+|---|---|
+| `instalar-glpi-agent.cmd` | Lanzador. Eleva privilegios y ejecuta el `.ps1` |
+| `instalar-glpi-agent.ps1` | Script principal de instalación |
 
-El script descarga automáticamente el instalador desde GitHub, realiza la instalación silenciosa y elimina el archivo descargado al finalizar.
+> [!IMPORTANT]
+> Ambos archivos deben estar en el mismo directorio. Ejecutar únicamente el `.cmd`.
+
+---
+
+## Método 1 — Instalación con script (recomendada)
+
+1. Copiar `instalar-glpi-agent.cmd` e `instalar-glpi-agent.ps1` al equipo destino.
+2. Ejecutar con clic derecho sobre el `.cmd` → **Ejecutar como administrador**.
+
+El script realiza automáticamente:
+
+- Detección de versión instalada — si ya existe una versión previa, avisa y solicita confirmación antes de desinstalar.
+- Descarga del instalador desde GitHub.
+- Pregunta interactiva para instalar el ícono de bandeja (AGENTMONITOR).
+- Instalación silenciosa del agente.
+- Envío forzado de inventario al servidor GLPI.
+- Generación de inventario local XML en `C:\repositorio\GLPI\logs\`.
+- Creación de accesos directos a la interfaz local del agente en `C:\repositorio\GLPI\`.
 
 > [!NOTE]
-> La versión del agente descargada está fijada en el script (`GLPI_AGENT_VERSION`). Si necesitás actualizar la versión, editá esa variable antes de ejecutar.
+> La versión del agente está fijada en el script (`$GLPI_AGENT_VERSION`). Para actualizar, modificar esa variable antes de ejecutar.
+
+> [!NOTE]
+> Desde la versión 1.8 en adelante, solo se distribuye instalador de 64 bits.
 
 ---
 
@@ -42,8 +65,7 @@ msiexec /i "GLPI-Agent-X.XX-x64.msi" /quiet /norestart ^
   RUNNOW=1 ^
   EXECMODE=1 ^
   ADD_FIREWALL_EXCEPTION=1 ^
-  AGENTMONITOR=1 ^
-  TAG="Staging"
+  AGENTMONITOR=1
 ```
 
 **Parámetros utilizados:**
@@ -54,17 +76,10 @@ msiexec /i "GLPI-Agent-X.XX-x64.msi" /quiet /norestart ^
 | `RUNNOW` | `1` | Ejecuta el inventario inmediatamente al finalizar la instalación |
 | `EXECMODE` | `1` | Corre el agente como servicio de Windows (inicio automático) |
 | `ADD_FIREWALL_EXCEPTION` | `1` | Agrega excepción en el firewall de Windows |
-| `AGENTMONITOR` | `1` | Instala el ícono de bandeja para monitorear el agente |
-| `TAG` | `Staging` | Clasifica el equipo como pendiente de asignación definitiva |
-
-> [!TIP]
-> El valor `Staging` indica que el equipo está pendiente de clasificación. Una vez asignado a su entidad en GLPI, el TAG puede actualizarse o eliminarse.
+| `AGENTMONITOR` | `0` o `1` | Instala el ícono de bandeja para monitorear el agente |
 
 > [!IMPORTANT]
-> El comando debe ejecutarse desde el directorio donde se encuentra el archivo `.msi`, o especificar la ruta completa al archivo.
-
-> [!NOTE]
-> Desde la versión 1.8 en adelante, solo se distribuye instalador de 64 bits.
+> El comando debe ejecutarse desde el directorio donde se encuentra el archivo `.msi`, o especificar la ruta completa.
 
 ---
 
@@ -79,11 +94,10 @@ msiexec /i "GLPI-Agent-X.XX-x64.msi" /quiet /norestart ^
 
 4. **Acuerdo de licencia** — Aceptar los términos y clic en **Next**.
 
-5. **Selección de componentes** — Dejar la selección por defecto (incluye el servicio y el monitor). Clic en **Next**.
+5. **Selección de componentes** — Dejar la selección por defecto. Clic en **Next**.
 
 6. **Configuración del servidor:**
    - **Server URL:** `https://soporte.igeek.ar`
-   - **Tag:** `Staging`
    - Clic en **Next**.
 
 7. **Modo de ejecución** — Seleccionar **Service (Recommended)**. Clic en **Next**.
@@ -115,15 +129,15 @@ El estado debe mostrar `RUNNING`. También puede verificarse desde `services.msc
 
 Abrir en el navegador: `http://localhost:62354`
 
-Desde esta interfaz puede forzarse manualmente un nuevo inventario.
+Desde esta interfaz puede forzarse manualmente un nuevo inventario. El acceso directo también está disponible en `C:\repositorio\GLPI\`.
 
-**3. Verificar el log del agente:**
+**3. Inventario local XML:**
 
 ```
-C:\Program Files\GLPI-Agent\var\glpi-agent.log
+C:\repositorio\GLPI\logs\NOMBREEQUIPO.xml
 ```
 
-Buscar líneas que contengan `Inventory ok` o `inventory sent` para confirmar el envío exitoso.
+Generado automáticamente por el script al finalizar la instalación.
 
 ---
 
@@ -138,11 +152,13 @@ Buscar líneas que contengan `Inventory ok` o `inventory sent` para confirmar el
    - Los datos de hardware (RAM, CPU, disco) están completos.
 
 > [!TIP]
-> Si el equipo no aparece en los primeros 5 minutos, verificar conectividad hacia `https://soporte.igeek.ar` y revisar el log local del agente.
+> Si el equipo no aparece en los primeros 5 minutos, verificar conectividad hacia `https://soporte.igeek.ar` y revisar la interfaz local del agente en `http://localhost:62354`.
 
 ---
 
 ## Desinstalación
+
+Desde consola con privilegios de administrador:
 
 ```cmd
 msiexec /x "GLPI-Agent-X.XX-x64.msi" /quiet
