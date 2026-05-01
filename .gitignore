@@ -1,3 +1,4 @@
+@"
 repositorio.ps1
 PENDIENTES.md
 *.log
@@ -8,6 +9,9 @@ PENDIENTES.md
 *.mdmp
 *.dat
 *.csv
+*.md
+*.docx
+!README.md
 logs/**
 !logs/**/
 !logs/**/.gitkeep
@@ -15,4 +19,4 @@ LOG/
 Smart/
 Data/
 temp_ccupdate/
-!glpi/docs/*.html
+"@ | Set-Content C:\Users\jmassisi\repositorio\.gitignore -Encoding UTF8
