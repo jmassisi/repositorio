@@ -12,23 +12,9 @@ irm repositorio.igeek.ar | iex
 
 Se descarga en `C:\repositorio`, limpia rastros al finalizar y abre la carpeta.
 
-## Estructura
+## Herramientas disponibles
 
-| Carpeta | Contenido |
-|---|---|
-| `anydesk/scripts` | Reset de ID y configuración de AnyDesk |
-| `anydesk/docs` | Documentación del reset de AnyDesk |
-| `scripts/sistema` | Scripts de optimización y configuración del sistema |
-| `scripts/drivers` | Backup y restauración de drivers |
-| `registro` | Tweaks de registro (.reg) |
-| `GLPI/scripts` | Agente y script de inventario forzado |
-| `GLPI/docs` | Documentación del agente GLPI |
-| `Zabbix` | Agente y configuración de monitoreo |
-
-## Gestión
-
-Cualquier actualización se refleja automáticamente en el próximo despliegue.
-
-```powershell
-git add . && git commit -m "descripcion" && git push
-```
+- **AnyDesk Reset** — Resetea ID y configuración
+- **GLPI Agent** — Instalación y forzado de inventario
+- **Office Install** — Instalación desatendida de Office
+- **Zabbix Agent** — Instalación y configuración de monitoreo *(en progreso)*
