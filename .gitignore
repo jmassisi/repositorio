@@ -1,22 +1,43 @@
-@"
-repositorio.ps1
-PENDIENTES.md
-*.log
+# ── Archivos de sistema ──────────────────────────────────────
 *.tmp
-*.html
 *.bak
 *.bin
 *.mdmp
 *.dat
 *.csv
+
+# ── Documentacion (generada) ─────────────────────────────────
+*.log
+*.html
 *.md
 *.docx
 !README.md
+# PDFs son el entregable final y si se versionan
+
+# ── Scripts de despliegue ────────────────────────────────────
+repositorio.ps1
+PENDIENTES.md
+
+# ── Logs (mantener carpetas, ignorar contenido) ───────────────
 logs/**
 !logs/**/
 !logs/**/.gitkeep
+anydesk/logs/**
+!anydesk/logs/**/.gitkeep
+glpi/logs/**
+!glpi/logs/**/.gitkeep
+office/logs/**
+!office/logs/**/.gitkeep
+zabbix/logs/**
+!zabbix/logs/**/.gitkeep
+
+# ── Office Deployment Tool ───────────────────────────────────
+office/scripts/officedeploymenttool*.exe
+office/scripts/setup.exe
+office/scripts/Office/
+
+# ── Carpetas temporales legacy ───────────────────────────────
 LOG/
 Smart/
 Data/
 temp_ccupdate/
-"@ | Set-Content C:\Users\jmassisi\repositorio\.gitignore -Encoding UTF8
