@@ -24,6 +24,8 @@ logs/**
 !logs/**/.gitkeep
 anydesk/logs/**
 !anydesk/logs/**/.gitkeep
+defprof/logs/**
+!defprof/logs/**/.gitkeep
 glpi/logs/**
 !glpi/logs/**/.gitkeep
 office/logs/**
