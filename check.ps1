@@ -8,7 +8,7 @@ if ($remoto -gt $local) {
     Write-Host "[A] Actualizar ahora   [Enter] Salir" -ForegroundColor Cyan
     $key = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     if ($key.Character -eq 'a' -or $key.Character -eq 'A') {
-        irm repositorio.igeek.ar | iex
+        Start-Process powershell -ArgumentList "-NoProfile -Command `"cd C:\; irm repositorio.igeek.ar | iex`"" -Verb RunAs
     }
 } else { 
     Write-Host "Todo actualizado" -ForegroundColor Green
