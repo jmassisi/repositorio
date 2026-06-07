@@ -1,8 +1,8 @@
-<Configuration ID="0ce89369-caa5-4061-94d5-6bc481e344e8">
-  <!--<Info Description="Instalación personalizada de Microsoft 365 Apps para empresas (64 bits). Incluye exclusivamente Word, Excel y PowerPoint. Configurado para implementación limpia vía CDN, remoción de versiones MSI previas y activación manual basada en usuario." />-->
-  <Info Description="Microsoft 365 Apps para empresas — Word, Excel, PowerPoint" />
-  <Add OfficeClientEdition="64" Channel="Current">
-    <Product ID="O365ProPlusRetail">
+<Configuration ID="3ce89369-caa5-4061-94d5-6bc481e344eb">
+  <!--<Info Description="Instalación personalizada de Office LTSC Standard 2024 (64 bits). Incluye exclusivamente Word, Excel y PowerPoint. Licencia perpetua, canal PerpetualVL2024, remoción de versiones MSI previas." />-->
+  <Info Description="Office LTSC Standard 2024 — Word, Excel, PowerPoint" />
+  <Add OfficeClientEdition="64" Channel="PerpetualVL2024">
+    <Product ID="Standard2024Volume">
       <Language ID="es-es" />
       <ExcludeApp ID="Access" />
       <ExcludeApp ID="Groove" />
@@ -10,7 +10,6 @@
       <ExcludeApp ID="OneDrive" />
       <ExcludeApp ID="OneNote" />
       <ExcludeApp ID="Outlook" />
-      <ExcludeApp ID="OutlookForWindows" />
       <ExcludeApp ID="Publisher" />
       <ExcludeApp ID="Teams" />
     </Product>

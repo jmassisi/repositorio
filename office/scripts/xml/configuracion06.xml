@@ -1,8 +1,8 @@
-<Configuration ID="0ce89369-caa5-4061-94d5-6bc481e344e8">
-  <!--<Info Description="Instalación personalizada de Microsoft 365 Apps para empresas (64 bits). Incluye exclusivamente Word, Excel y PowerPoint. Configurado para implementación limpia vía CDN, remoción de versiones MSI previas y activación manual basada en usuario." />-->
-  <Info Description="Microsoft 365 Apps para empresas — Word, Excel, PowerPoint" />
-  <Add OfficeClientEdition="64" Channel="Current">
-    <Product ID="O365ProPlusRetail">
+<Configuration ID="5ce89369-caa5-4061-94d5-6bc481e344ed">
+  <!--<Info Description="Instalación personalizada de Office LTSC Standard 2024 (64 bits). Incluye exclusivamente Word y Excel. Licencia perpetua, canal PerpetualVL2024, remoción de versiones MSI previas." />-->
+  <Info Description="Office LTSC Standard 2024 — Word, Excel" />
+  <Add OfficeClientEdition="64" Channel="PerpetualVL2024">
+    <Product ID="Standard2024Volume">
       <Language ID="es-es" />
       <ExcludeApp ID="Access" />
       <ExcludeApp ID="Groove" />
@@ -10,7 +10,7 @@
       <ExcludeApp ID="OneDrive" />
       <ExcludeApp ID="OneNote" />
       <ExcludeApp ID="Outlook" />
-      <ExcludeApp ID="OutlookForWindows" />
+      <ExcludeApp ID="PowerPoint" />
       <ExcludeApp ID="Publisher" />
       <ExcludeApp ID="Teams" />
     </Product>
@@ -22,7 +22,6 @@
   <RemoveMSI />
   <AppSettings>
     <User Key="software\microsoft\office\16.0\excel\options" Name="defaultformat" Value="51" Type="REG_DWORD" App="excel16" Id="L_SaveExcelfilesas" />
-    <User Key="software\microsoft\office\16.0\powerpoint\options" Name="defaultformat" Value="27" Type="REG_DWORD" App="ppt16" Id="L_SavePowerPointfilesas" />
     <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
   </AppSettings>
   <Display Level="Full" AcceptEULA="TRUE" />

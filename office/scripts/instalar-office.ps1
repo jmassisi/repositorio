@@ -110,7 +110,8 @@ function Ensure-Odt {
 
         if ($latest) {
             Write-Log "Version online disponible: $($latest.Build)"
-            if ($localBuild -and $localBuild.Replace(',','.') -eq $latest.Build) {
+            $localBuildShort = ($localBuild -split '\.', 3)[2]
+        if ($localBuildShort -and $localBuildShort -eq $latest.Build) {
                 Write-Log "ODT actualizado. Usando version local."
             } else {
                 Write-Log "Nueva version disponible. Descargando..." 'WARN'
@@ -220,7 +221,14 @@ function Select-Xml {
     Write-Host "   Configuraciones disponibles:" -ForegroundColor White
     Write-Host ""
     for ($i = 0; $i -lt $xmlFiles.Count; $i++) {
-        Write-Host "   $($i + 1)) $($xmlFiles[$i].Name)" -ForegroundColor Yellow
+        $xmlFile = $xmlFiles[$i]
+		if ($i -gt 0) { Write-Host "" }
+        Write-Host "   $($i + 1)) $($xmlFile.Name)" -ForegroundColor Yellow
+        try {
+            [xml]$xmlContent = Get-Content $xmlFile.FullName -Encoding UTF8
+            $desc = $xmlContent.Configuration.Info.Description
+            if ($desc) { Write-Host "       $desc" -ForegroundColor Gray }
+        } catch {}
     }
     Write-Host ""
 
