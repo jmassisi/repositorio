@@ -18,6 +18,7 @@ Se descarga en `C:\repositorio`, limpia rastros al finalizar y abre la carpeta.
 - **DefProf** — Despliega y actualiza el perfil por defecto de Windows
 - **GLPI Agent** — Instalación y forzado de inventario
 - **Office Install** — Instalación desatendida de Office
+- **Sysinternals** — Herramientas de Sysinternals (Autologon)
 - **Zabbix Agent** — Instalación y configuración de monitoreo *(en progreso)*
 
 ## Gestión
@@ -47,5 +48,6 @@ irm repositorio.igeek.ar | iex
 | `office/` | Instalación desatendida de Office |
 | `scripts/sistema` | Scripts de optimización y configuración del sistema |
 | `scripts/drivers` | Backup y restauración de drivers |
+| `sysinternals/` | Herramientas de Sysinternals (autologon) |
 | `Zabbix/` | Agente y configuración de monitoreo |
 | `registro/` | Tweaks de registro (.reg) |
