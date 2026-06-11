@@ -1,4 +1,4 @@
-# Instalar-Office.ps1 - v1.0
+# Instalar-Office.ps1 - v1.2
 # Instalacion de Microsoft 365 Apps via Office Deployment Tool (ODT)
 # - Deteccion y actualizacion automatica del ODT
 # - Menu de seleccion de XML dinamico (lee carpeta xml\)
@@ -92,7 +92,7 @@ function Get-LatestOdtUrl {
 
 # ── Gestion del ODT ──────────────────────────────────────────
 function Ensure-Odt {
-    Write-Step 1 4 "Verificando Office Deployment Tool..."
+    Write-Step 1 5 "Verificando Office Deployment Tool..."
 
     # Buscar ODT existente en el directorio actual
     $existingOdt = Get-ChildItem -Filter 'officedeploymenttool*.exe' -ErrorAction SilentlyContinue |
@@ -204,9 +204,149 @@ function Extract-Odt {
     }
 }
 
+# ── Deteccion y desinstalacion de Office ─────────────────────
+function Detect-Office {
+    Write-Step 2 5 "Detectando instalacion de Office..."
+
+    $officeKey = @(
+        'HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration',
+        'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Office\ClickToRun\Configuration'
+    ) | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+    if ($officeKey) {
+        $props     = Get-ItemProperty $officeKey -ErrorAction SilentlyContinue
+        $version   = $props.VersionToReport
+        $channel   = $props.CDNBaseUrl -replace '^.*/', ''
+        $clientId  = $props.ProductReleaseIds
+
+        Write-Host ""
+        Write-Host "   [!] Se detecto una instalacion de Office:" -ForegroundColor Yellow
+        Write-Host "       Version : $version" -ForegroundColor White
+        Write-Host "       Canal   : $channel" -ForegroundColor White
+        Write-Host "       Producto: $clientId" -ForegroundColor White
+        Write-Host ""
+        Write-Log "Office detectado: Version=$version Canal=$channel Producto=$clientId"
+
+        Write-Host "   1) Desinstalar Office (SaRACmd) y continuar" -ForegroundColor Yellow
+        Write-Host "   2) Instalar encima sin desinstalar" -ForegroundColor Yellow
+        Write-Host "   3) Salir" -ForegroundColor White
+        Write-Host ""
+
+        do {
+            $op = Read-Host "   Opcion"
+        } while ($op -notin @('1','2','3'))
+
+        switch ($op) {
+            '1' { Uninstall-Office }
+            '2' { Write-Log "Usuario eligio instalar encima sin desinstalar." }
+            '3' { exit 0 }
+        }
+    } else {
+        Write-Host ""
+        Write-Host "   Sin instalacion previa de Office detectada." -ForegroundColor Green
+        Write-Log "No se detecto instalacion previa de Office."
+        Write-Host ""
+        Read-Host "   Enter para continuar"
+    }
+}
+
+function Uninstall-Office {
+    $saraUrl  = 'https://aka.ms/SaRA_EnterpriseVersionFiles'
+    $saraZip  = '.\SaRACmd.zip'
+    $saraDir  = '.\SaRACmd'
+    $saraExe  = "$saraDir\GetHelpCmd.exe"
+
+    Write-Host ""
+    Write-Host "   Descargando SaRACmd desde Microsoft..." -ForegroundColor Yellow
+    Write-Log "Descargando SaRACmd desde: $saraUrl"
+
+    try {
+        Invoke-WebRequest -Uri $saraUrl -OutFile $saraZip -UseBasicParsing -TimeoutSec 120
+        Write-Log "Descarga SaRACmd OK."
+    } catch {
+        Write-Log "Error descargando SaRACmd: $_" 'ERROR'
+        Write-Host "   [-] No se pudo descargar SaRACmd. Verifica la conexion." -ForegroundColor Red
+        Write-Host "   [!] Descarga manual: https://aka.ms/SaRA_EnterpriseVersionFiles" -ForegroundColor Yellow
+        pause; exit 1
+    }
+
+    try {
+        Expand-Archive -Path $saraZip -DestinationPath $saraDir -Force
+        Write-Log "SaRACmd extraido en: $saraDir"
+    } catch {
+        Write-Log "Error extrayendo SaRACmd: $_" 'ERROR'
+        pause; exit 1
+    }
+
+    if (-not (Test-Path $saraExe)) {
+        # Buscar el exe en subcarpetas (el zip puede tener una carpeta interna)
+        $saraExe = Get-ChildItem -Path $saraDir -Filter 'GetHelpCmd.exe' -Recurse -ErrorAction SilentlyContinue |
+                   Select-Object -First 1 | Select-Object -ExpandProperty FullName
+    }
+
+    if (-not $saraExe) {
+        Write-Log "GetHelpCmd.exe no encontrado despues de extraer." 'ERROR'
+        pause; exit 1
+    }
+
+    Write-Host "   Desinstalando Office (esto puede tardar varios minutos)..." -ForegroundColor Yellow
+    Write-Log "Ejecutando SaRACmd: $saraExe"
+
+    # Cerrar procesos de Office antes de desinstalar
+    $officeProcs = @('winword','excel','powerpnt','outlook','onenote','msaccess','mspub','teams','lync')
+    foreach ($proc in $officeProcs) {
+        Stop-Process -Name $proc -Force -ErrorAction SilentlyContinue
+    }
+
+    $result = Start-Process -FilePath $saraExe `
+                            -ArgumentList '-S OfficeScrubScenario -AcceptEula' `
+                            -Wait -PassThru -NoNewWindow
+    $exitCode = $result.ExitCode
+
+    Write-Log "SaRACmd exit code: $exitCode"
+
+    if ($exitCode -eq 0) {
+        Write-Host "   [+] Office desinstalado correctamente." -ForegroundColor Green
+        Write-Log "Desinstalacion completada exitosamente."
+    } else {
+        Write-Host "   [!] SaRACmd finalizo con codigo: $exitCode" -ForegroundColor Yellow
+        Write-Host "   [!] Continua con la instalacion. Verifica el log si hay problemas." -ForegroundColor Yellow
+        Write-Log "SaRACmd finalizo con codigo $exitCode - puede requerir revision." 'WARN'
+    }
+
+    # Limpiar archivos temporales de SaRA
+    Remove-Item $saraZip -Force -ErrorAction SilentlyContinue
+    Remove-Item $saraDir -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Log "Archivos temporales de SaRACmd eliminados."
+
+    # Esperar que la desinstalacion en segundo plano finalice
+    Write-Host ""
+    Write-Host "   Esperando que finalice la desinstalacion en segundo plano..." -ForegroundColor Yellow
+    $waited = 0
+    while ($true) {
+        $running = Get-Process -ErrorAction SilentlyContinue |
+                   Where-Object { $_.Name -match 'OfficeClickToRun|OffScrub' }
+        if (-not $running) { break }
+        Start-Sleep -Seconds 3
+        $waited += 3
+        Write-Host ("   {0}s - en proceso: {1}" -f $waited, (($running.Name | Select-Object -Unique) -join ', ')) -ForegroundColor Gray
+    }
+
+    if ($waited -gt 0) {
+        Write-Host "   [+] Desinstalacion en segundo plano completada ($waited s)." -ForegroundColor Green
+        Write-Log "Desinstalacion en segundo plano completada tras $waited s."
+    } else {
+        Write-Host "   [+] No se detectaron procesos pendientes." -ForegroundColor Green
+        Write-Log "No se detectaron procesos de desinstalacion en segundo plano."
+    }
+
+    Write-Host ""
+    Read-Host "   Enter para continuar con la instalacion"
+}
+
 # ── Seleccion de XML ─────────────────────────────────────────
 function Select-Xml {
-    Write-Step 2 4 "Seleccionando configuracion..."
+    Write-Step 3 5 "Seleccionando configuracion..."
 
     $xmlFiles = Get-ChildItem -Path $XML_DIR -Filter '*.xml' -ErrorAction SilentlyContinue |
                 Sort-Object Name
@@ -243,7 +383,7 @@ function Select-Xml {
 
 # ── Menu de operacion ─────────────────────────────────────────
 function Select-Operation([string]$xmlPath) {
-    Write-Step 3 4 "Seleccionando operacion..."
+    Write-Step 4 5 "Seleccionando operacion..."
 
     Write-Host ""
     Write-Host "   1) Instalar Office (online)" -ForegroundColor Yellow
@@ -260,7 +400,7 @@ function Select-Operation([string]$xmlPath) {
 
     switch ($op) {
         '1' {
-            Write-Step 4 4 "Instalando Office (online)..."
+            Write-Step 5 5 "Instalando Office (online)..."
             Write-Log "Ejecutando: setup.exe /configure $xmlPath"
             Start-Process -FilePath (Resolve-Path $SETUP_EXE) `
                           -ArgumentList "/configure `"$xmlPath`"" `
@@ -268,7 +408,7 @@ function Select-Operation([string]$xmlPath) {
             Write-Log "Instalacion completada."
         }
         '2' {
-            Write-Step 4 4 "Descargando archivos de Office para uso offline..."
+            Write-Step 5 5 "Descargando archivos de Office para uso offline..."
             Write-Log "Ejecutando: setup.exe /download $xmlPath"
             Start-Process -FilePath (Resolve-Path $SETUP_EXE) `
                           -ArgumentList "/download `"$xmlPath`"" `
@@ -282,7 +422,7 @@ function Select-Operation([string]$xmlPath) {
                 Write-Log "Carpeta .\Office\ no encontrada para instalacion offline." 'ERROR'
                 pause; exit 1
             }
-            Write-Step 4 4 "Instalando Office desde archivos offline..."
+            Write-Step 5 5 "Instalando Office desde archivos offline..."
             Write-Log "Ejecutando: setup.exe /configure $xmlPath (offline)"
             Start-Process -FilePath (Resolve-Path $SETUP_EXE) `
                           -ArgumentList "/configure `"$xmlPath`"" `
@@ -296,6 +436,7 @@ function Select-Operation([string]$xmlPath) {
 # ── Main ─────────────────────────────────────────────────────
 Write-Header
 Ensure-Odt
+Detect-Office
 $xmlPath = Select-Xml
 Select-Operation $xmlPath
 

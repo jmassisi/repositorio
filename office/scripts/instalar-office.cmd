@@ -1,12 +1,5 @@
 @echo off
 :: Lanzador de Instalar-Office.ps1
-:: Eleva privilegios y bypasea ExecutionPolicy sin cambiarla globalmente
+:: Abre una sola ventana de PowerShell elevada
 
-net session >nul 2>&1
-if errorlevel 1 (
-    powershell -Command "Start-Process '%~f0' -Verb RunAs"
-    exit /b
-)
-
-cd /d "%~dp0"
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Instalar-Office.ps1"
+powershell -NoProfile -Command "Start-Process powershell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -NoExit -Command Set-Location \"%~dp0\"; & \"%~dp0Instalar-Office.ps1\"' -Verb RunAs"
