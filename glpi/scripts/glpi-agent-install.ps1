@@ -1,18 +1,21 @@
 #Requires -RunAsAdministrator
 # ============================================================
 #  glpi-agent-install.ps1 - Instalacion silenciosa - GLPI Agent
-#  Servidor: https://soporte.igeek.ar
+#  Servidor: configurable al ejecutar
 #  Version: 3.0  (2026-04-30)
 # ============================================================
-
 $ErrorActionPreference = 'Stop'
-
 $AGENT_DIR     = "C:\Program Files\GLPI-Agent"
 $REPO_GLPI     = "C:\repositorio\GLPI"
 $LOG_DIR       = "C:\repositorio\GLPI\logs"
 $SHORTCUT_NAME = "GLPI Agent"
 $WINGET_ID     = "GLPI-Project.GLPI-Agent"
-$SERVER_URL    = "https://soporte.igeek.ar"
+Write-Host "`nURL del servidor GLPI (ej: https://soporte.ejemplo.com):" -ForegroundColor Cyan
+$SERVER_URL    = Read-Host "Servidor"
+if ([string]::IsNullOrWhiteSpace($SERVER_URL)) {
+    Write-Host "URL requerida. Saliendo." -ForegroundColor Red
+    exit 1
+}
 
 function Write-Step($msg) { Write-Host "`n==> $msg" -ForegroundColor Cyan }
 function Write-OK($msg)   { Write-Host "[OK] $msg" -ForegroundColor Green }
