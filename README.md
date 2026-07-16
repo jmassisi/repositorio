@@ -51,3 +51,4 @@ irm repositorio.igeek.ar | iex
 | `sysinternals/` | Herramientas de Sysinternals (autologon) |
 | `Zabbix/` | Agente y configuración de monitoreo |
 | `registro/` | Tweaks de registro (.reg) |
+# test
