@@ -5,7 +5,7 @@ while ($true) {
     Write-Host "================================="
     Write-Host ""
     $local = (Get-Item C:\repositorio).LastWriteTime
-    $remoto = [datetime](irm https://api.github.com/repos/jmassisi/repositorio/commits/main).commit.author.date
+    $remoto = [datetime](irm https://repositorio.igeek.ar/version.txt)
     Write-Host "Local:  $local"
     Write-Host "GitHub: $($remoto.ToLocalTime())"
     Write-Host ""
