@@ -10,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 $ts      = Get-Date -Format 'yyyy-MM-dd_HHmmss'
 $logDir  = 'C:\repositorio\logs\defprof'
 $logFile = "$logDir\defprof_$ts.log"
-$defprof = 'C:\IT\defprof.exe'
+$defprof = 'C:\repositorio\defprof\bin\defprof.exe'
 
 $DEFPROF_EXE_HASH  = '1a0574aeca4b95c3aa54813182ca41254f15f32fddfe0406756759bca0fc5949'
 
@@ -65,46 +65,25 @@ function Test-DefProfIntegrity {
     return ($hashOk -and $sigOk)
 }
 
-# ── Preparacion de defprof ────────────────────────────────────
+# ── Verificacion de defprof ───────────────────────────────────
 function Ensure-DefProf {
 
-    if (Test-Path $defprof) {
-        if (Test-DefProfIntegrity $defprof) {
-            Write-Log "defprof.exe presente y verificado."
-            return
-        }
-        Write-Log "defprof.exe existente no supero la verificacion. Se reinstalara." 'WARN'
-    }
-
-    $fuente = 'C:\repositorio\defprof\bin\defprof.exe'
-
-    if (-not (Test-Path $fuente)) {
-        Write-Log "Busqueda de $fuente: no existe." 'ERROR'
-        Write-Host "`n   [-] No se encontro defprof.exe en el repositorio ($fuente)." -ForegroundColor Red
+    if (-not (Test-Path $defprof)) {
+        Write-Log "Busqueda de $defprof: no existe." 'ERROR'
+        Write-Host "`n   [-] No se encontro defprof.exe en el repositorio ($defprof)." -ForegroundColor Red
         Write-Host "   [!] Actualiza el repositorio desde el menu ([A]) y relanza el script." -ForegroundColor Yellow
         Read-Host "`nPresiona Enter para cerrar"
         exit 1
     }
 
-    if (-not (Test-DefProfIntegrity $fuente)) {
+    if (-not (Test-DefProfIntegrity $defprof)) {
         Write-Log "defprof.exe del repositorio no supero la verificacion de integridad." 'ERROR'
         Write-Host "`n   [-] El defprof.exe del repositorio no supero la verificacion (hash/firma)." -ForegroundColor Red
         Read-Host "`nPresiona Enter para cerrar"
         exit 1
     }
 
-    if (-not (Test-Path 'C:\IT')) { New-Item 'C:\IT' -ItemType Directory -Force | Out-Null }
-    Copy-Item $fuente $defprof -Force
-    Write-Log "defprof.exe instalado en $defprof desde el repositorio."
-
-    if (Test-DefProfIntegrity $defprof) {
-        Write-Log "defprof.exe verificado correctamente."
-    } else {
-        Write-Log "La copia en $defprof no supero la verificacion final." 'ERROR'
-        Write-Host "`n   [!] La copia instalada no supero la verificacion (hash/firma)." -ForegroundColor Yellow
-        Read-Host "`nPresiona Enter para cerrar"
-        exit 1
-    }
+    Write-Log "defprof.exe verificado. Ejecutando desde el repositorio."
 }
 
 Ensure-DefProf
