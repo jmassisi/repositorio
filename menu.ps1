@@ -6,8 +6,9 @@ while ($true) {
     Write-Host ""
     $local = (Get-Item C:\repositorio).LastWriteTime
     $remoto = [datetime](irm https://repositorio.igeek.ar/version.txt)
-    Write-Host "Local:  $local"
-    Write-Host "GitHub: $($remoto.ToLocalTime())"
+    $formato = 'dd/MM/yyyy HH:mm:ss'
+    Write-Host "Local:  $($local.ToString($formato))"
+    Write-Host "GitHub: $($remoto.ToLocalTime().ToString($formato))"
     Write-Host ""
     if ($remoto.ToLocalTime() -gt $local) {
         Write-Host "[A] Actualizar ahora" -ForegroundColor Yellow
