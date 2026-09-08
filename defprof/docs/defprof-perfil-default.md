@@ -1,6 +1,6 @@
 # Perfil por defecto en Windows con DefProf
 
-**Versión del documento:** 1.2
+**Versión del documento:** 1.3
 **Herramienta:** DefProf — [ForensiT](https://www.forensit.com/downloads.html)
 **Sistema operativo:** Windows 10/11 — Windows Server 2016+ (64 bits)
 
@@ -30,7 +30,7 @@ DefProf convierte un usuario real en la plantilla que Windows usa para crear tod
 
 | Archivo | Descripción |
 |---|---|
-| `bin\defprof.exe` | Binario de DefProf, versionado y verificado (SHA-256 + firma Authenticode) en cada ejecución |
+| `bin\defprof.exe` | Binario de DefProf, versionado y verificado (SHA-256 + firma Authenticode) en cada ejecución. Hash SHA-256: `1a0574aeca4b95c3aa54813182ca41254f15f32fddfe0406756759bca0fc5949` |
 | `actualizar-default.ps1` | Lista usuarios locales, verifica integridad de `defprof.exe` y ejecuta DefProf sobre el molde elegido |
 | `actualizar-default.cmd` | Lanzador. Eleva privilegios y ejecuta el `.ps1` |
 
@@ -39,9 +39,9 @@ DefProf convierte un usuario real en la plantilla que Windows usa para crear tod
 
 ---
 
-## Prerequisito — Limpiar bloatware a nivel sistema
+## Recomendación (opcional) — Limpiar bloatware a nivel sistema
 
-DefProf copia el perfil de usuario, pero las apps provisionadas por Windows se reinstalan para cada usuario nuevo independientemente del molde. Removerlas antes de capturar el molde:
+No es obligatorio, pero se recomienda antes de capturar un molde: DefProf copia el perfil de usuario, pero las apps provisionadas por Windows se reinstalan para cada usuario nuevo independientemente del molde. Removerlas antes de capturar el molde:
 
 ```powershell
 # Ver apps provisionadas
@@ -98,7 +98,7 @@ A partir de este momento, cualquier usuario nuevo que se cree en la PC nace como
 ## Paso 3 — Actualizar el molde con los cambios
 
 1. Iniciar sesión en el usuario molde (u otra cuenta admin distinta al usuario a capturar).
-2. Ejecutar `actualizar-default.cmd`.
+2. Ejecutar la opción **actualizar-default** del menú del repositorio (`C:\repositorio\menu.cmd`), o directamente su lanzador `C:\repositorio\defprof\scripts\actualizar-default.cmd`.
 3. Seleccionar el usuario a capturar cuando el script lo solicite.
 4. A partir de este momento, cualquier usuario nuevo hereda ese estado.
 
@@ -110,7 +110,7 @@ A partir de este momento, cualquier usuario nuevo que se cree en la PC nace como
 ## Ciclo de actualización
 
 ```
-Configurar molde → Cerrar sesión → Entrar a otra cuenta admin → ejecutar actualizar-default.cmd
+Configurar molde → Cerrar sesión → Entrar a otra cuenta admin → ejecutar actualizar-default (menú)
 ```
 
 Cada vez que se quiera actualizar el estándar:
@@ -120,7 +120,7 @@ Cada vez que se quiera actualizar el estándar:
 3. Limpiar credenciales e historial.
 4. Cerrar sesión.
 5. Entrar a cualquier otra cuenta admin.
-6. Ejecutar `actualizar-default.cmd` y elegir el usuario molde.
+6. Ejecutar la opción **actualizar-default** del menú (`C:\repositorio\menu.cmd`) y elegir el usuario molde.
 
 ---
 
@@ -160,7 +160,7 @@ Distribuirlo con el repo resuelve tres cosas:
 
 ### Método de verificación
 
-- **Hash:** el hash SHA-256 del binario (`Get-FileHash -Algorithm SHA256`) se compara contra un valor **pinned en el script**. El valor se fijó contrastando múltiples fuentes independientes (descarga directa del sitio oficial de [ForensiT](https://www.forensit.com/downloads.html) y paquete [DefProf](https://community.chocolatey.org/packages/defprof) del repositorio de Chocolatey) — ambas dieron el mismo hash para el mismo `defprof.exe`.
+- **Hash:** el hash SHA-256 del binario (`Get-FileHash -Algorithm SHA256`) se compara contra un valor **pinned en el script** y documentado arriba: `1a0574aeca4b95c3aa54813182ca41254f15f32fddfe0406756759bca0fc5949`. El valor se fijó contrastando múltiples fuentes independientes (descarga directa del sitio oficial de [ForensiT](https://www.forensit.com/downloads.html) y paquete [DefProf](https://community.chocolatey.org/packages/defprof) del repositorio de Chocolatey) — ambas dieron el mismo hash para el mismo `defprof.exe`.
 - **Firma:** la firma Authenticode del binario debe ser `Valid` y pertenecer al firmante **ForensiT Limited**. El certificado base lo emite Symantec/VeriSign y la cadena se verifica contra las raíces de confianza de Windows (`Get-AuthenticodeSignature`).
 
 > [!NOTE]
