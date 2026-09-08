@@ -12,7 +12,9 @@
 *.md
 *.docx
 !README.md
-# PDFs son el entregable final y si se versionan
+!**/docs/*.md
+# Los .md de docs/ de cada utilidad se versionan (fuente mantenible);
+# el resto de la documentacion (.pdf, .html, .docx) vive solo en Drive.
 
 # ── Scripts de despliegue ────────────────────────────────────
 repositorio.ps1
