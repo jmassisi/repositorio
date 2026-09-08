@@ -1,6 +1,6 @@
 # Perfil por defecto en Windows con DefProf
 
-**Versión del documento:** 1.1
+**Versión del documento:** 1.2
 **Herramienta:** DefProf — [ForensiT](https://www.forensit.com/downloads.html)
 **Sistema operativo:** Windows 10/11 — Windows Server 2016+ (64 bits)
 
@@ -145,6 +145,26 @@ Antes de cada ejecución, `actualizar-default.ps1` comprueba `bin\defprof.exe`:
 | Firma Authenticode | `Get-AuthenticodeSignature` — debe ser `Valid` y firmante `ForensiT Limited` |
 
 Si cualquiera de los dos falla, el script muestra el motivo y aborta. Nunca ejecuta un binario no verificado.
+
+---
+
+## ¿Por qué se distribuye `defprof.exe` dentro del repositorio?
+
+El binario se versiona en `defprof/bin/` (y viaja en el despliegue a `C:\repositorio`) porque el sitio de [ForensiT](https://www.forensit.com/downloads.html) protege sus descargas con un challenge de Cloudflare que bloquea la descarga automatizada por script (devuelve una página HTML de verificación en lugar del archivo). La descarga manual desde el navegador funciona, pero no es reproducible ni automatizable.
+
+Distribuirlo con el repo resuelve tres cosas:
+
+1. **Reproducibilidad** — el despliegue funciona igual en cualquier equipo, sin depender de una descarga externa.
+2. **Integridad verificable** — el binario se valida contra hash y firma en cada ejecución; si alguien lo reemplaza, el script aborta.
+3. **Trazabilidad** — el binario queda versionado junto al script que lo usa: mismo commit, misma versión, mismo despliegue.
+
+### Método de verificación
+
+- **Hash:** el hash SHA-256 del binario (`Get-FileHash -Algorithm SHA256`) se compara contra un valor **pinned en el script**. El valor se fijó contrastando múltiples fuentes independientes (descarga directa del sitio oficial de [ForensiT](https://www.forensit.com/downloads.html) y paquete [DefProf](https://community.chocolatey.org/packages/defprof) del repositorio de Chocolatey) — ambas dieron el mismo hash para el mismo `defprof.exe`.
+- **Firma:** la firma Authenticode del binario debe ser `Valid` y pertenecer al firmante **ForensiT Limited**. El certificado base lo emite Symantec/VeriSign y la cadena se verifica contra las raíces de confianza de Windows (`Get-AuthenticodeSignature`).
+
+> [!NOTE]
+> La descarga original desde el sitio de ForensiT (`https://www.forensit.com/Downloads/DefProf.msi`) se descomprime con `msiexec /a` y de ahí se extrae `DefProf.exe`. Tanto el `.exe` como el `.msi` de origen conviven verificados en el repositorio de trabajo durante el proceso de implantación.
 
 ---
 

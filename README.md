@@ -40,15 +40,24 @@ irm repositorio.igeek.ar | iex
 
 ## Estructura
 
-| Carpeta | Contenido |
-|---|---|
-| `anydesk/` | Reset de ID y configuración de AnyDesk |
-| `defprof/` | Perfil por defecto con DefProf |
-| `GLPI/` | Agente y script de instalación |
-| `office/` | Instalación desatendida de Office |
-| `scripts/sistema` | Scripts de optimización y configuración del sistema |
-| `scripts/drivers` | Backup y restauración de drivers |
-| `sysinternals/` | Herramientas de Sysinternals (autologon) |
-| `Zabbix/` | Agente y configuración de monitoreo |
-| `registro/` | Tweaks de registro (.reg) |
-# test
+| Carpeta | Contenido | Documentación |
+|---|---|---|
+| `anydesk/` | Reset de ID y configuración de AnyDesk | [anydesk-reset.md](anydesk/docs/anydesk-reset.md) |
+| `defprof/` | Perfil por defecto con DefProf | [defprof-perfil-default.md](defprof/docs/defprof-perfil-default.md) |
+| `glpi/` | Agente y script de instalación | [glpi-agent-instalacion.md](glpi/docs/glpi-agent-instalacion.md) |
+| `office/` | Instalación desatendida de Office | [instalar-office.md](office/docs/instalar-office.md) |
+| `scripts/sistema` | Scripts de optimización y configuración del sistema | — |
+| `scripts/drivers` | Backup y restauración de drivers | — |
+| `sysinternals/` | Herramientas de Sysinternals (autologon) | — |
+| `zabbix/` | Agente y configuración de monitoreo | — |
+| `registro/` | Tweaks de registro (.reg) | — |
+
+---
+
+## Descargo de responsabilidad
+
+**AS IS sin garantías.** Este repositorio se distribuye "tal cual" y **sin garantía de ningún tipo**, expresa o implícita, incluyendo pero no limitado a garantías de idoneidad para un fin particular y no infracción.
+
+El uso de estas herramientas y scripts es **bajo la responsabilidad del operador**. Los scripts incluyen verificaciones de integridad (hash y firma) y toma de backups antes de modificaciones, pero **ninguna de estas salvaguardas garantiza** que el resultado sea el esperado en todos los entornos. Antes de usar una herramienta en producción, validarla en un entorno de prueba.
+
+Los binarios de terceros versionados en este repositorio (ej. `defprof/bin/defprof.exe`) pertenecen a sus respectivos autores y se distribuyen con fines de soporte técnico. Verificar siempre su origen y licencia antes de su uso.
