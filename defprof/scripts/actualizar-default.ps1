@@ -1,6 +1,6 @@
 # actualizar-default.ps1
 # Ejecuta defprof sobre el usuario molde elegido
-# Descarga y verifica defprof.exe automaticamente si falta o no es confiable
+# Usa defprof.exe desde C:\repositorio\defprof\bin\ con verificacion de integralidad
 # Requiere: ejecutar como Administrador | Log en: C:\repositorio\logs\defprof\
 
 #Requires -RunAsAdministrator
@@ -12,9 +12,7 @@ $logDir  = 'C:\repositorio\logs\defprof'
 $logFile = "$logDir\defprof_$ts.log"
 $defprof = 'C:\IT\defprof.exe'
 
-$DEFPROF_URL       = 'https://www.forensit.com/Downloads/DefProf.msi'
 $DEFPROF_EXE_HASH  = '1a0574aeca4b95c3aa54813182ca41254f15f32fddfe0406756759bca0fc5949'
-$TMP_DIR           = "$env:TEMP\defprof_setup"
 
 if (-not (Test-Path $logDir)) { New-Item $logDir -ItemType Directory -Force | Out-Null }
 
@@ -67,7 +65,7 @@ function Test-DefProfIntegrity {
     return ($hashOk -and $sigOk)
 }
 
-# ── Descarga y preparacion de defprof ─────────────────────────
+# ── Preparacion de defprof ────────────────────────────────────
 function Ensure-DefProf {
 
     if (Test-Path $defprof) {
@@ -78,85 +76,35 @@ function Ensure-DefProf {
         Write-Log "defprof.exe existente no supero la verificacion. Se reinstalara." 'WARN'
     }
 
-    Write-Host ""
-    Write-Log "Descargando DefProf desde ForensiT..."
-    Write-Host "   Descarga: $DEFPROF_URL" -ForegroundColor Yellow
+    $fuente = 'C:\repositorio\defprof\bin\defprof.exe'
 
-    $msiPath = "$TMP_DIR\DefProf.msi"
-    if (Test-Path $TMP_DIR) { Remove-Item $TMP_DIR -Recurse -Force -ErrorAction SilentlyContinue }
-    New-Item $TMP_DIR -ItemType Directory -Force | Out-Null
-
-    try {
-        & curl.exe -L -o $msiPath $DEFPROF_URL
-        if ($LASTEXITCODE -ne 0) { throw "curl.exe devolvio codigo $LASTEXITCODE" }
-        $msiSize = (Get-Item $msiPath).Length
-        if ($msiSize -lt 200KB) {
-            throw "Archivo descargado demasiado pequeno ($([Math]::Round($msiSize/1KB)) KB)"
-        }
-        Write-Log "MSI descargado OK ($([Math]::Round($msiSize/1KB)) KB)"
-    } catch {
-        Write-Log "Error descargando DefProf: $_" 'ERROR'
-        Write-Host "`n   [-] No se pudo descargar DefProf automaticamente." -ForegroundColor Red
-        Write-Host "   [!] Descargalo manualmente de https://www.forensit.com/downloads.html" -ForegroundColor Yellow
-        Write-Host "   [!] y copia defprof.exe a C:\IT\, luego relanza el script." -ForegroundColor Yellow
+    if (-not (Test-Path $fuente)) {
+        Write-Log "Busqueda de $fuente: no existe." 'ERROR'
+        Write-Host "`n   [-] No se encontro defprof.exe en el repositorio ($fuente)." -ForegroundColor Red
+        Write-Host "   [!] Actualiza el repositorio desde el menu ([A]) y relanza el script." -ForegroundColor Yellow
         Read-Host "`nPresiona Enter para cerrar"
         exit 1
     }
 
-    Write-Host ""
-    Write-Log "Extrayendo DefProf.exe del MSI..."
-    $extractDir = "$TMP_DIR\extracted"
-    New-Item $extractDir -ItemType Directory -Force | Out-Null
-
-    try {
-        $proc = Start-Process -FilePath 'msiexec.exe' `
-                              -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$extractDir`"" `
-                              -Wait -PassThru -NoNewWindow
-        Write-Log "msiexec exit code: $($proc.ExitCode)"
-    } catch {
-        Write-Log "Error extrayendo el MSI: $_" 'ERROR'
-        Remove-Item $TMP_DIR -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host "`n   [-] No se pudo extraer DefProf del MSI." -ForegroundColor Red
-        Write-Host "   [!] Descarga manual: https://www.forensit.com/downloads.html" -ForegroundColor Yellow
-        Read-Host "`nPresiona Enter para cerrar"
-        exit 1
-    }
-
-    $extracted = Get-ChildItem -Path $extractDir -Filter 'DefProf.exe' -Recurse -ErrorAction SilentlyContinue |
-                 Select-Object -First 1
-
-    if (-not $extracted) {
-        Write-Log "DefProf.exe no encontrado despues de extraer." 'ERROR'
-        Remove-Item $TMP_DIR -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host "`n   [-] No se pudo extraer DefProf.exe del MSI." -ForegroundColor Red
-        Write-Host "   [!] Descarga manual: https://www.forensit.com/downloads.html" -ForegroundColor Yellow
+    if (-not (Test-DefProfIntegrity $fuente)) {
+        Write-Log "defprof.exe del repositorio no supero la verificacion de integridad." 'ERROR'
+        Write-Host "`n   [-] El defprof.exe del repositorio no supero la verificacion (hash/firma)." -ForegroundColor Red
         Read-Host "`nPresiona Enter para cerrar"
         exit 1
     }
 
     if (-not (Test-Path 'C:\IT')) { New-Item 'C:\IT' -ItemType Directory -Force | Out-Null }
-    Copy-Item $extracted.FullName $defprof -Force
-    Write-Log "defprof.exe instalado en $defprof"
+    Copy-Item $fuente $defprof -Force
+    Write-Log "defprof.exe instalado en $defprof desde el repositorio."
 
-    # ── Verificacion final ──
     if (Test-DefProfIntegrity $defprof) {
-        Write-Log "defprof.exe descargado y verificado correctamente."
+        Write-Log "defprof.exe verificado correctamente."
     } else {
-        Write-Log "defprof.exe descargado no supero la verificacion de integridad." 'ERROR'
-        Write-Host "`n   [!] El archivo descargado no supero la verificacion (hash/firma)." -ForegroundColor Yellow
-        Write-Host "       Continuar implica ejecutar un archivo no verificado." -ForegroundColor White
-        $op = Read-Host "       Continuar de todos modos? (S/N)"
-        if ($op -notmatch '^(S|s|Si|si)$') {
-            Remove-Item $TMP_DIR -Recurse -Force -ErrorAction SilentlyContinue
-            Write-Log "Operacion cancelada por verificacion fallida." 'WARN'
-            Read-Host "`nPresiona Enter para cerrar"
-            exit 1
-        }
-        Write-Log "El usuario decidio continuar con defprof.exe no verificado." 'WARN'
+        Write-Log "La copia en $defprof no supero la verificacion final." 'ERROR'
+        Write-Host "`n   [!] La copia instalada no supero la verificacion (hash/firma)." -ForegroundColor Yellow
+        Read-Host "`nPresiona Enter para cerrar"
+        exit 1
     }
-
-    Remove-Item $TMP_DIR -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Log "Archivos temporales eliminados."
 }
 
 Ensure-DefProf
