@@ -9,7 +9,7 @@ function Descargar {
         $shell = New-Object -ComObject Shell.Application
         $shell.Windows() | Where-Object {$_.LocationURL -like "*repositorio*"} | ForEach-Object {$_.Quit()}
         Start-Sleep -Seconds 1
-        Rename-Item $d "C:\repositorio_bkp_$(Get-Date -Format 'yyyy-MM-dd')" -Force 
+        Rename-Item $d "C:\repositorio_bkp_$(Get-Date -Format 'yyyy-MM-dd_HHmmss')" -Force 
     }
     irm https://github.com/jmassisi/repositorio/archive/refs/heads/main.zip -OutFile $z
     Expand-Archive $z $env:TEMP\rextract -Force
