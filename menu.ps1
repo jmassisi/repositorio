@@ -27,9 +27,10 @@ while ($true) {
     }
     Write-Host "----------------------------"
     Write-Host ""
-    $scripts = Get-ChildItem "C:\repositorio\*\scripts\*.ps1" | Where-Object { $_.Name -notmatch "check" }
+    $rutas = Get-ChildItem "C:\repositorio\*\scripts\*.ps1" | Where-Object { $_.Name -notmatch "check" }
+    $utilidades = $rutas | Group-Object { $_.Directory.Parent.Name } | Sort-Object Name
     $i = 1
-    $scripts | ForEach-Object { Write-Host "[$i] $($_.BaseName)"; $i++ }
+    $utilidades | ForEach-Object { Write-Host "[$i] $($_.Name)"; $i++ }
     Write-Host ""
     Write-Host "----------------------------"
     Write-Host "[0] Salir"
@@ -40,12 +41,38 @@ while ($true) {
         Start-Process powershell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\repositorio.ps1" -Actualizar' -Verb RunAs
         exit
     }
-    $elegido = $scripts[$sel - 1]
-    if ($elegido) {
+    $utilidad = $utilidades[$sel - 1]
+    if (-not $utilidad) {
+        Write-Host "Opcion invalida" -ForegroundColor Red
+        Start-Sleep -Seconds 2
+        continue
+    }
+    if ($utilidad.Count -eq 1) {
+        $elegido = $utilidad.Group
         Set-Location $elegido.DirectoryName
         powershell -ExecutionPolicy Bypass -File $elegido.FullName
     } else {
-        Write-Host "Opcion invalida" -ForegroundColor Red
-        Start-Sleep -Seconds 2
+        while ($true) {
+            Clear-Host
+            Write-Host "================================="
+            Write-Host "           $($utilidad.Name.ToUpper())           "
+            Write-Host "================================="
+            Write-Host ""
+            $j = 1
+            $utilidad.Group | ForEach-Object { Write-Host "[$j] $($_.BaseName)"; $j++ }
+            Write-Host ""
+            Write-Host "[0] Volver"
+            Write-Host ""
+            $sub = Read-Host "Seleccione"
+            if ($sub -eq "0") { break }
+            $elegido = $utilidad.Group[$sub - 1]
+            if ($elegido) {
+                Set-Location $elegido.DirectoryName
+                powershell -ExecutionPolicy Bypass -File $elegido.FullName
+            } else {
+                Write-Host "Opcion invalida" -ForegroundColor Red
+                Start-Sleep -Seconds 2
+            }
+        }
     }
 }
