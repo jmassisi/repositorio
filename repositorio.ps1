@@ -26,8 +26,9 @@ if (-not (Test-Path $d)) {
     Descargar
 } else {
     $local = (Get-Item $d).LastWriteTime
-    $remoto = [datetime](irm https://repositorio.igeek.ar/version.txt)
-    if ($remoto.ToLocalTime() -gt $local) {
+    $commit = (irm 'https://api.github.com/repos/jmassisi/repositorio/commits?per_page=1')[0].commit
+    $remoto = ([datetime]$commit.committer.date).ToLocalTime()
+    if ($remoto -gt $local) {
         Write-Host "Actualizacion disponible (GitHub: $($remoto.ToLocalTime()))" -ForegroundColor Yellow
         Write-Host "[A] Actualizar   [Enter] Cancelar" -ForegroundColor Cyan
         $key = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
