@@ -69,8 +69,8 @@ function Test-DefProfIntegrity {
 function Ensure-DefProf {
 
     if (-not (Test-Path $defprof)) {
-        Write-Log "Busqueda de $defprof: no existe." 'ERROR'
-        Write-Host "`n   [-] No se encontro defprof.exe en el repositorio ($defprof)." -ForegroundColor Red
+        Write-Log "Busqueda de ${defprof}: no existe." 'ERROR'
+        Write-Host "`n   [-] No se encontro defprof.exe en el repositorio (${defprof})." -ForegroundColor Red
         Write-Host "   [!] Actualiza el repositorio desde el menu ([A]) y relanza el script." -ForegroundColor Yellow
         Read-Host "`nPresiona Enter para cerrar"
         exit 1
