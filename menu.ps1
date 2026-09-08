@@ -5,14 +5,24 @@ while ($true) {
     Write-Host "================================="
     Write-Host ""
     $local = (Get-Item C:\repositorio).LastWriteTime
-    $remoto = [datetime](irm https://repositorio.igeek.ar/version.txt)
+    try {
+        $commit = (irm 'https://api.github.com/repos/jmassisi/repositorio/commits?per_page=1')[0].commit
+        $remoto = [datetime]$commit.committer.date
+        $github = $remoto.ToLocalTime()
+    } catch {
+        $github = $null
+    }
     $formato = 'dd/MM/yyyy HH:mm:ss'
     Write-Host "Local:  $($local.ToString($formato))"
-    Write-Host "GitHub: $($remoto.ToLocalTime().ToString($formato))"
-    Write-Host ""
-    if ($remoto.ToLocalTime() -gt $local) {
-        Write-Host "[A] Actualizar ahora" -ForegroundColor Yellow
+    if ($github) {
+        Write-Host "GitHub: $($github.ToString($formato))"
+        if ($github -gt $local) {
+            Write-Host "[A] Actualizar ahora" -ForegroundColor Yellow
+        } else {
+            Write-Host "Todo actualizado" -ForegroundColor Green
+        }
     } else {
+        Write-Host "GitHub: consulta fallida (revisa conexion)" -ForegroundColor Red
         Write-Host "Todo actualizado" -ForegroundColor Green
     }
     Write-Host "----------------------------"
