@@ -51,14 +51,22 @@ if ($SourceUser) {
     Write-Host "Cuenta activa: $env:USERNAME"
     Write-Host ""
     Write-Host "Usuarios locales:"
-    $usuarios | ForEach-Object { Write-Host "  - $($_.Name)" }
+    $i = 1
+    $usuarios | ForEach-Object { Write-Host "  [$i] $($_.Name)"; $i++ }
     Write-Host ""
-    $origen = Read-Host "Usuario con Win+X funcional (origen)"
-    if (-not $origen) {
-        Write-Log "No se ingreso ningun usuario origen." 'ERROR'
+    $opcion = Read-Host "Usuario con Win+X funcional (origen)"
+    $n = 0
+    if (-not [int]::TryParse($opcion, [ref]$n)) {
+        Write-Log "No se ingreso un numero valido: '$opcion'." 'ERROR'
         Read-Host "`nPresiona Enter para cerrar"
         exit 1
     }
+    if ($n -lt 1 -or $n -gt $usuarios.Count) {
+        Write-Log "Numero fuera de rango: $n" 'ERROR'
+        Read-Host "`nPresiona Enter para cerrar"
+        exit 1
+    }
+    $origen = $usuarios[$n - 1].Name
 }
 
 $srcWinX = "C:\Users\$origen\AppData\Local\Microsoft\Windows\WinX"
