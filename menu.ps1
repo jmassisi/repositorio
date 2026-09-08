@@ -37,7 +37,7 @@ while ($true) {
     $sel = Read-Host "Seleccione"
     if ($sel -eq "0") { exit }
     if ($sel -eq "A" -or $sel -eq "a") {
-        Start-Process powershell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\repositorio.ps1"' -Verb RunAs
+        Start-Process powershell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\repositorio.ps1" -Actualizar' -Verb RunAs
         exit
     }
     $elegido = $scripts[$sel - 1]
