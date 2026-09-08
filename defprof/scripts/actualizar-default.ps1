@@ -87,7 +87,8 @@ function Ensure-DefProf {
     New-Item $TMP_DIR -ItemType Directory -Force | Out-Null
 
     try {
-        Invoke-WebRequest -Uri $DEFPROF_URL -OutFile $msiPath -UseBasicParsing -TimeoutSec 120
+        & curl.exe -L -o $msiPath $DEFPROF_URL
+        if ($LASTEXITCODE -ne 0) { throw "curl.exe devolvio codigo $LASTEXITCODE" }
         $msiSize = (Get-Item $msiPath).Length
         if ($msiSize -lt 200KB) {
             throw "Archivo descargado demasiado pequeno ($([Math]::Round($msiSize/1KB)) KB)"
