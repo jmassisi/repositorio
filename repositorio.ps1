@@ -40,7 +40,7 @@ function Descargar {
             Rename-Item $d $bkp -Force
             Log "OK: $d -> $bkp"
         } catch {
-            Log "ERROR renombrando $d: $($_.Exception.Message)"
+            Log "ERROR renombrando ${d}: $($_.Exception.Message)"
             throw
         }
     }
