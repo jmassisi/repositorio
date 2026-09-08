@@ -1,6 +1,6 @@
 # Perfil por defecto en Windows con DefProf
 
-**Versión del documento:** 1.3
+**Versión del documento:** 1.4
 **Herramienta:** DefProf — [ForensiT](https://www.forensit.com/downloads.html)
 **Sistema operativo:** Windows 10/11 — Windows Server 2016+ (64 bits)
 
@@ -11,6 +11,9 @@
 DefProf convierte un usuario real en la plantilla que Windows usa para crear todos los usuarios futuros. Es un proceso cíclico: cuando el estándar cambia, se actualiza el molde y se vuelve a correr.
 
 **Regla de oro:** siempre correr `defprof` desde una cuenta distinta a la que se usa como molde. Windows bloquea los archivos del perfil (`NTUSER.DAT`) mientras la sesión está activa.
+
+> [!WARNING]
+> **No correr `defprof` con cuentas autenticadas activas en el molde.** Si en el usuario molde quedó iniciada una sesión de Google, Microsoft u otro servicio (navegador, correo, apps de inicio de sesión), esa sesión se **replica a todos los perfiles nuevos** que nacen del molde. Antes de capturar el molde, cerrar sesión de esos servicios, limpiar credenciales e historial (ver Paso 2, punto 4).
 
 ---
 
@@ -33,6 +36,8 @@ DefProf convierte un usuario real en la plantilla que Windows usa para crear tod
 | `bin\defprof.exe` | Binario de DefProf, versionado y verificado (SHA-256 + firma Authenticode) en cada ejecución. Hash SHA-256: `1a0574aeca4b95c3aa54813182ca41254f15f32fddfe0406756759bca0fc5949` |
 | `actualizar-default.ps1` | Lista usuarios locales, verifica integridad de `defprof.exe` y ejecuta DefProf sobre el molde elegido |
 | `actualizar-default.cmd` | Lanzador. Eleva privilegios y ejecuta el `.ps1` |
+| `fix-winx.ps1` | Repara el menú Win + X post-defprof: copia accesos directos ocultos desde un usuario funcional hacia la plantilla `Default` (ver [fix-winx.md](fix-winx.md)) |
+| `fix-winx.cmd` | Lanzador de `fix-winx.ps1`. Eleva privilegios y ejecuta el `.ps1` |
 
 > [!IMPORTANT]
 > Ambos scripts deben estar junto a la carpeta `bin\`. El usuario debe ejecutar únicamente el `.cmd`.
