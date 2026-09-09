@@ -2,6 +2,15 @@ param([switch]$Actualizar)
 
 $ErrorActionPreference = 'Stop'
 
+# Auto-elevacion: renombrar/mover en C:\ requiere admin. Si no lo somos,
+# relanzarse elevado (mismo contenido) y salir del proceso actual.
+$principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "Solicitando permisos de administrador..." -ForegroundColor Yellow
+    Start-Process powershell -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -Command "irm repositorio.igeek.ar | iex"'
+    return
+}
+
 $d       = "C:\repositorio"
 $z       = "$env:TEMP\r.zip"
 $logsBak = "$env:TEMP\repositorio_logs"
