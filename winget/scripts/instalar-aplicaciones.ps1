@@ -1,4 +1,4 @@
-# instalar-winget.ps1
+# instalar-aplicaciones.ps1
 # Instala aplicaciones via winget desde una lista (apps.json).
 # Seleccion multiple: numeros separados por coma (1,3,5), 't' = todas, Enter = cancelar.
 # Requiere: Administrador | winget disponible (Windows 11 / Win10 reciente)
@@ -11,7 +11,7 @@ $root    = Split-Path $PSScriptRoot -Parent
 $appsJson = Join-Path $root 'apps.json'
 $logDir  = Join-Path $root 'logs'
 $ts      = Get-Date -Format 'yyyy-MM-dd_HHmmss'
-$logFile = Join-Path $logDir "instalar-winget_$ts.log"
+$logFile = Join-Path $logDir "instalar-aplicaciones_$ts.log"
 
 if (-not (Test-Path $logDir)) { New-Item $logDir -ItemType Directory -Force | Out-Null }
 

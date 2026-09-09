@@ -1,5 +1,5 @@
 @echo off
-:: Lanzador de instalar-winget.ps1
+:: Lanzador de instalar-aplicaciones.ps1
 :: Eleva privilegios y bypasea ExecutionPolicy sin cambiarla globalmente
 :: Usa Windows PowerShell (5.1) integrado (decision 2026-09-09: no migrar a pwsh)
 
@@ -10,5 +10,5 @@ if errorlevel 1 (
     exit /b
 )
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0instalar-winget.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0instalar-aplicaciones.ps1"
 pause

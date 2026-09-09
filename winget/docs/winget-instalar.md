@@ -15,7 +15,7 @@ Desde el menú del repositorio (`C:\repositorio\menu.cmd`), elegir la opción `w
 También se puede ejecutar directo el lanzador elevado:
 
 ```powershell
-C:\repositorio\winget\scripts\instalar-winget.cmd
+C:\repositorio\winget\scripts\instalar-aplicaciones.cmd
 ```
 
 ## Lista de aplicaciones (`apps.json`)
