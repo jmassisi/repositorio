@@ -25,6 +25,21 @@ function Write-Step($n, $total, $msg) {
     Add-Content -Path $logFile -Value "`n--- $msg ---" -Encoding UTF8
 }
 
+function Abrir-Autologon {
+    Write-Host ""
+    $abrir = Read-Host "Abrir Autologon ahora? (S/N)"
+    if ($abrir -match '^[sS]$') {
+        $exe = if ([Environment]::Is64BitOperatingSystem) { 'Autologon64.exe' } else { 'Autologon.exe' }
+        $path = Join-Path $destDir $exe
+        if (Test-Path $path) {
+            Start-Process $path
+            Write-Log "OK: se abrio $path"
+        } else {
+            Write-Log "ERROR: no se pudo abrir $path"
+        }
+    }
+}
+
 Add-Content -Path $logFile -Value "================================================" -Encoding UTF8
 Add-Content -Path $logFile -Value " instalar-autologon  |  $ts"                       -Encoding UTF8
 Add-Content -Path $logFile -Value " Host   : $env:COMPUTERNAME"                       -Encoding UTF8
@@ -41,6 +56,7 @@ if ($faltantes.Count -eq 0) {
     $re = Read-Host "`nRe-descargar de todas formas? (S/N)"
     if ($re -notmatch '^[sS]$') {
         Write-Log "SKIP: binarios ya presentes, no se re-descargo"
+        Abrir-Autologon
         Write-Host ""
         Write-Host "Listo." -ForegroundColor Green
         Read-Host "`nPresiona Enter para volver al menu"
@@ -71,18 +87,7 @@ Write-Host ""
 Write-Host "Autologon instalado en:" -ForegroundColor Cyan
 Write-Host "   $destDir" -ForegroundColor Green
 foreach ($bin in $binarios) { Write-Host "   $destDir\$bin" -ForegroundColor Green }
-Write-Host ""
-$abrir = Read-Host "`nAbrir Autologon ahora? (S/N)"
-if ($abrir -match '^[sS]$') {
-    $exe = if ([Environment]::Is64BitOperatingSystem) { 'Autologon64.exe' } else { 'Autologon.exe' }
-    $path = Join-Path $destDir $exe
-    if (Test-Path $path) {
-        Start-Process $path
-        Write-Log "OK: se abrio $path"
-    } else {
-        Write-Log "ERROR: no se pudo abrir $path"
-    }
-}
+Abrir-Autologon
 
 Add-Content -Path $logFile -Value "`n================================================`n" -Encoding UTF8
 Write-Host ("`nListo. Log guardado en:`n   " + $logFile)
