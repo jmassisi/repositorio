@@ -36,6 +36,11 @@ while ($true) {
     Write-Host "[0] Salir"
     Write-Host ""
     $sel = Read-Host "Seleccione"
+    if ([string]::IsNullOrWhiteSpace($sel)) {
+        Write-Host "Opcion invalida" -ForegroundColor Red
+        Start-Sleep -Seconds 2
+        continue
+    }
     if ($sel -eq "0") { exit }
     if ($sel -eq "A" -or $sel -eq "a") {
         Start-Process powershell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\repositorio.ps1" -Actualizar' -Verb RunAs
@@ -64,6 +69,11 @@ while ($true) {
             Write-Host "[0] Volver"
             Write-Host ""
             $sub = Read-Host "Seleccione"
+            if ([string]::IsNullOrWhiteSpace($sub)) {
+                Write-Host "Opcion invalida" -ForegroundColor Red
+                Start-Sleep -Seconds 2
+                continue
+            }
             if ($sub -eq "0") { break }
             $elegido = $utilidad.Group[$sub - 1]
             if ($elegido) {
