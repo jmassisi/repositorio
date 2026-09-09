@@ -3,7 +3,7 @@
 # NO toca el sistema: crea un shim (winget.cmd) en %USERPROFILE%\bin y agrega
 # esa carpeta al PATH de usuario. No requiere admin.
 # Requiere: PowerShell 7 (pwsh).
-# Reversible: ver winget/docs/winget-alias-workaround.md (seccion "Deshacer").
+# Reversible: ver workarounds/docs/workarounds.md (seccion "Deshacer").
 
 $ErrorActionPreference = 'Stop'
 

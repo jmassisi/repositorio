@@ -50,7 +50,6 @@ Elementos existentes: `anydesk`, `defprof`, `glpi`, `office`, `sysinternals`, `w
 Vive **fuera** del repo (no se despliega ni se sube):
 - `~/notas/arquitectura.md`, `~/notas/chats.md`, `~/notas/reglas-proyecto.md`, `~/notas/repositorio-PENDIENTES.md`.
 
-## Estado conocido — ramas
+## Estado conocido — legado
 
-- `fix/winget-fallback`: fallback de resolución de winget + workaround de alias (ver `winget/docs/winget-alias-workaround.md`). **Decisión de merge a `main` pendiente** (advertido en la propia doc).
-- `docs/agents-md`: este archivo.
+- Workaround de alias winget **mergeado a `main`** (2026-09-09): vive ahora en `workarounds/` (ver `workarounds/docs/workarounds.md`). La decisión de su ubicación fue moverlo de `winget/scripts/` a una carpeta propia `workarounds/` para que el menú lo liste como categoría visible y no quede oculto.

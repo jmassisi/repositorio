@@ -51,6 +51,7 @@ irm repositorio.igeek.ar | iex
 | `scripts/drivers` | Backup y restauración de drivers | — |
 | `sysinternals/` | Herramientas de Sysinternals (autologon) | — |
 | `winget/` | Instalación de aplicaciones vía Winget desde lista | [winget-instalar.md](winget/docs/winget-instalar.md) |
+| `workarounds/` | Workarounds puntuales (fix de alias winget, etc.) | [workarounds.md](workarounds/docs/workarounds.md) |
 | `zabbix/` | Agente y configuración de monitoreo | — |
 | `registro/` | Tweaks de registro (.reg) | — |
 
