@@ -19,6 +19,7 @@ Se descarga en `C:\repositorio`, limpia rastros al finalizar y abre la carpeta.
 - **GLPI Agent** — Instalación y forzado de inventario
 - **Office Install** — Instalación desatendida de Office
 - **Sysinternals** — Herramientas de Sysinternals (Autologon)
+- **Winget** — Instalación de aplicaciones vía Winget desde una lista (selección múltiple)
 - **Zabbix Agent** — Instalación y configuración de monitoreo *(en progreso)*
 
 ## Gestión
@@ -49,6 +50,7 @@ irm repositorio.igeek.ar | iex
 | `scripts/sistema` | Scripts de optimización y configuración del sistema | — |
 | `scripts/drivers` | Backup y restauración de drivers | — |
 | `sysinternals/` | Herramientas de Sysinternals (autologon) | — |
+| `winget/` | Instalación de aplicaciones vía Winget desde lista | [winget-instalar.md](winget/docs/winget-instalar.md) |
 | `zabbix/` | Agente y configuración de monitoreo | — |
 | `registro/` | Tweaks de registro (.reg) | — |
 
