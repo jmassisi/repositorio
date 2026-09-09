@@ -20,12 +20,30 @@ function Write-Log {
     Add-Content -Path $logFile -Value "[$ts][$level] $msg" -Encoding UTF8
 }
 
-if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+function Get-WingetExe {
+    # (a) alias / PATH normal
+    $cmd = Get-Command winget -ErrorAction SilentlyContinue
+    if ($cmd -and $cmd.Source -and (Test-Path $cmd.Source)) {
+        return $cmd.Source
+    }
+    # (b) motor Appx directo (alias de WindowsApps roto o desactivado)
+    $pkg = Get-AppxPackage Microsoft.DesktopAppInstaller -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($pkg -and $pkg.InstallLocation) {
+        $exe = Join-Path $pkg.InstallLocation 'winget.exe'
+        if (Test-Path $exe) { return $exe }
+    }
+    return $null
+}
+
+$wingetExe = Get-WingetExe
+if (-not $wingetExe) {
     Write-Host "`n   [-] winget no esta disponible en este equipo." -ForegroundColor Red
     Write-Host "   [!] Instalalo desde la Microsoft Store o https://github.com/microsoft/winget-cli" -ForegroundColor Yellow
     Read-Host "`nPresiona Enter para cerrar"
     exit 1
 }
+Write-Host "   Winget  : $wingetExe" -ForegroundColor DarkGray
+Write-Log "Winget resuelto: $wingetExe"
 
 if (-not (Test-Path $appsJson)) {
     Write-Host "`n   [-] No se encontro apps.json en: $appsJson" -ForegroundColor Red
@@ -33,7 +51,8 @@ if (-not (Test-Path $appsJson)) {
     exit 1
 }
 
-$apps = @(Get-Content $appsJson -Encoding UTF8 | ConvertFrom-Json)
+$apps = Get-Content -Raw $appsJson -Encoding UTF8 | ConvertFrom-Json
+if ($apps -isnot [System.Array]) { $apps = @($apps) }
 if ($apps.Count -eq 0) {
     Write-Host "`n   [-] apps.json no tiene aplicaciones." -ForegroundColor Red
     Read-Host "`nPresiona Enter para cerrar"
@@ -98,10 +117,11 @@ for ($k = 0; $k -lt $total; $k++) {
     Write-Host ("`n[{0}/{1}] Instalando: {2} ({3})" -f $num, $total, $app.nombre, $app.id) -ForegroundColor Cyan
     Add-Content -Path $logFile -Value "--- [$num/$total] $($app.nombre) ($($app.id)) ---" -Encoding UTF8
 
-    $cmd = "winget install -e --id `"$($app.id)`" --silent --accept-package-agreements --accept-source-agreements $($app.args)"
+    $wingetArgs = @('install','-e','--id',$app.id,'--silent','--accept-package-agreements','--accept-source-agreements')
+    if ($app.args) { $wingetArgs += $app.args.Trim() -split '\s+' }
     $exitCode = 0
     try {
-        Invoke-Expression $cmd *>&1 | ForEach-Object {
+        & $wingetExe @wingetArgs *>&1 | ForEach-Object {
             Write-Host "   $_"
             Add-Content -Path $logFile -Value "   $_" -Encoding UTF8
         }
