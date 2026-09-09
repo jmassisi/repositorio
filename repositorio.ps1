@@ -13,7 +13,7 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
 
 $d       = "C:\repositorio"
 $z       = "$env:TEMP\r.zip"
-$logsBak = "$env:TEMP\repositorio_logs"
+$runtimeBak = "$env:TEMP\repositorio_runtime"
 $ts      = Get-Date -Format 'yyyy-MM-dd_HHmmss'
 $log     = "$env:TEMP\repositorio_$ts.log"
 
@@ -39,9 +39,16 @@ function Descargar {
     }
     Start-Sleep -Seconds 1
 
-    if (Test-Path $logsBak) { Remove-Item $logsBak -Recurse -Force }
-    Copy-Item "$d\*\logs" $logsBak -Recurse -Force -EA 0
-    Log "logs actuales respaldados en $logsBak"
+    if (Test-Path $runtimeBak) { Remove-Item $runtimeBak -Recurse -Force }
+    Get-ChildItem $d -Directory -EA 0 | ForEach-Object {
+        $elem = $_.Name
+        Get-ChildItem $_.FullName -Directory -EA 0 | Where-Object { $_.Name -notin @('scripts', 'docs') } | ForEach-Object {
+            $dest = Join-Path $runtimeBak (Join-Path $elem $_.Name)
+            New-Item -ItemType Directory -Force -Path $dest | Out-Null
+            Copy-Item "$($_.FullName)\*" $dest -Recurse -Force -EA 0
+        }
+    }
+    Log "runtime de cada elemento respaldado en $runtimeBak"
 
     Log "descargando main.zip..."
     irm https://github.com/jmassisi/repositorio/archive/refs/heads/main.zip -OutFile $z
@@ -77,11 +84,21 @@ function Descargar {
     }
 
     Remove-Item "$env:TEMP\rextract",$z -Recurse -Force
-    Get-ChildItem $logsBak -Directory -EA 0 | ForEach-Object {
-        $dest = "$d\$($_.Name)\logs"
-        if (Test-Path $dest) { Copy-Item "$($_.FullName)\*" $dest -Recurse -Force -EA 0 }
+    Get-ChildItem $runtimeBak -Directory -EA 0 | ForEach-Object {
+        $dest = "$d\$($_.Name)"
+        if (Test-Path $dest) {
+            Get-ChildItem $_.FullName -Directory -EA 0 | ForEach-Object {
+                $destElem = Join-Path $dest $_.Name
+                # logs: siempre se mergean (el zip trae solo .gitkeep)
+                # resto: se restaura solo si el deploy no lo trajo (era runtime)
+                if ($_.Name -eq 'logs' -or -not (Test-Path $destElem)) {
+                    New-Item -ItemType Directory -Force -Path $destElem | Out-Null
+                    Copy-Item "$($_.FullName)\*" $destElem -Recurse -Force -EA 0
+                }
+            }
+        }
     }
-    Remove-Item $logsBak -Recurse -Force -EA 0
+    Remove-Item $runtimeBak -Recurse -Force -EA 0
     Remove-Item "$d\.gitignore","$d\PENDIENTES.md","$d\AGENTS.md" -Force -EA 0
     Get-ChildItem $d -Recurse -Filter '.gitkeep' | Remove-Item -Force -EA 0
     Log "Descargar: fin OK"
