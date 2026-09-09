@@ -123,11 +123,10 @@ if ($Actualizar) {
     Log "repositorio actualizado"
     Write-Host "Repositorio actualizado." -ForegroundColor Green
     Write-Host "Log: $log" -ForegroundColor Yellow
-    Read-Host "`nPresiona Enter para cerrar"
-} else {
-    Remove-Item (Get-PSReadLineOption).HistorySavePath -EA 0; Clear-History
-    Set-Location $origCwd
-    Write-Host "Listo. Presione cualquier tecla para abrir la carpeta..." -ForegroundColor Green
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-    Start-Process explorer.exe $d
 }
+
+Set-Location $origCwd
+Remove-Item (Get-PSReadLineOption).HistorySavePath -EA 0; Clear-History -EA 0
+Write-Host "Listo. Presione cualquier tecla para abrir la carpeta..." -ForegroundColor Green
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+Start-Process explorer.exe $d
