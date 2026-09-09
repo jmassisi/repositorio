@@ -27,7 +27,7 @@ Elementos existentes: `anydesk`, `defprof`, `glpi`, `office`, `sysinternals`, `w
 - **Documentación**: solo `.md`. Los `.pdf`/`.html`/`.docx` están **deprecados** (decisión 2026-09-08) y viven solo en Drive. Cada elemento nuevo lleva su `docs/<elemento>.md`.
 - **Scripts**: cada `.ps1` con su `.cmd` lanzador que eleva privilegios y bypasea ExecutionPolicy sin cambiarla globalmente.
 - **Logs**: siempre en `C:\repositorio\<elemento>\logs\`, con timestamp `<nombre>_YYYY-MM-DD_HHmmss.log`.
-- **Shell objetivo**: el usuario trabaja con **PowerShell 7 (pwsh)** y NO usa Windows PowerShell 5.1. No asumir compatibilidad con 5.1; diferencias de `ConvertFrom-Json`/etc. rompen en silencio. **Estado real (2026-09-09)**: los `.cmd` lanzadores del repo aún invocan `powershell` 5.1; migrarlos a `pwsh` es un pendiente transversal (winget ya lo tiene en `fix/winget-fallback`).
+- **Shell objetivo**: los scripts se ejecutan vía **Windows PowerShell 5.1** (los `.cmd` lanzadores invocan `powershell`). **Decisión 2026-09-09: NO migrar a pwsh.** No asumir compatibilidad con PowerShell 7/6 (`ConvertFrom-Json` rompe en silencio con 5.1 si no se normaliza el resultado a array). El usuario corre los scripts desde la PC cliente con este flujo.
 - **Límite del repo**: agnóstico — sin credenciales, sin datos de clientes, sin infraestructura iGeek.
 
 ## Git / flujo de trabajo
