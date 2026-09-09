@@ -1,6 +1,6 @@
 # Reparación del menú Win + X post-defprof
 
-**Versión del documento:** 1.0
+**Versión del documento:** 1.1
 **Herramienta:** Fix-WinX (reparación complementaria de [perfil por defecto con DefProf](defprof-perfil-default.md))
 **Sistema operativo:** Windows 10/11
 
@@ -26,7 +26,7 @@ Al ejecutarse DefProf, los accesos directos ocultos (`Group1`, `Group2` y `Group
 ## 4. Cómo se implementa
 
 1. Ejecutar la opción **fix-winx** del menú del repositorio (`C:\repositorio\menu.cmd`), o directamente el lanzador `C:\repositorio\defprof\scripts\fix-winx.cmd`.
-2. Indicar el **usuario con Win + X funcional** (origen). Si se deja vacío, el script lista los usuarios locales para elegir.
+2. Indicar el **usuario con Win + X funcional** (origen) elegido de la lista numerada local.
 3. El script copia los accesos directos ocultos hacia la plantilla `Default`, la carpeta WinX del usuario actual, normaliza atributos y reinicia el Explorador.
 
 > [!NOTE]
@@ -38,6 +38,8 @@ Al ejecutarse DefProf, los accesos directos ocultos (`Group1`, `Group2` y `Group
 # PowerShell como Administrador
 .\fix-winx.ps1 -SourceUser "nombre_usuario_origen"
 ```
+
+`-SourceUser` es opcional: si se omite, se muestra la lista numerada de usuarios locales.
 
 ## 5. Archivos
 
