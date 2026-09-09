@@ -51,3 +51,5 @@ Write-Host ""
 Write-Host "Workaround aplicado. IMPORTANTE: abri una terminal NUEVA y verificá:" -ForegroundColor White
 Write-Host "    winget --version" -ForegroundColor Green
 Write-Host "    where.exe winget" -ForegroundColor Green
+Write-Host ""
+pause

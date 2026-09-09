@@ -52,7 +52,7 @@ while ($true) {
         Start-Sleep -Seconds 2
         continue
     }
-    if ($utilidad.Count -eq 1) {
+    if ($utilidad.Count -eq 1 -and $utilidad.Name -ne "workarounds") {
         $elegido = $utilidad.Group
         Set-Location $elegido.DirectoryName
         powershell -ExecutionPolicy Bypass -File $elegido.FullName
