@@ -44,3 +44,12 @@ Al agregar una app a la lista del repositorio, mantener orden alfabetico por nom
 
 - Administrador (el lanzador eleva)
 - Winget disponible: Windows 11 o Windows 10 reciente (ya viene integrado); si no, instalarlo desde la Microsoft Store
+
+## Resolucion de winget (fallback)
+
+El script localiza `winget` en este orden:
+
+1. `Get-Command winget` (alias en el PATH / WindowsApps)
+2. Motor Appx directo: `%LOCALAPPDATA%\Microsoft\WindowsApps\winget.exe` via `Get-AppxPackage Microsoft.DesktopAppInstaller`
+
+Si el alias de WindowsApps esta desactivado o roto (Settings → Apps → App execution aliases), el paso 2 lo encuentra igual. El path resuelto se muestra al inicio y queda en el log.
