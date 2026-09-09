@@ -28,6 +28,7 @@ while ($true) {
     Write-Host "----------------------------"
     Write-Host ""
     $rutas = Get-ChildItem "C:\repositorio\*\scripts\*.ps1" | Where-Object { $_.Name -notmatch "check" }
+    $colecciones = @("workarounds", "sysinternals")
     $utilidades = $rutas | Group-Object { $_.Directory.Parent.Name } | Sort-Object Name
     $i = 1
     $utilidades | ForEach-Object { Write-Host "[$i] $($_.Name)"; $i++ }
@@ -52,7 +53,7 @@ while ($true) {
         Start-Sleep -Seconds 2
         continue
     }
-    if ($utilidad.Count -eq 1 -and $utilidad.Name -ne "workarounds") {
+    if ($utilidad.Count -eq 1 -and $colecciones -notcontains $utilidad.Name) {
         $elegido = $utilidad.Group
         Set-Location $elegido.DirectoryName
         powershell -ExecutionPolicy Bypass -File $elegido.FullName
