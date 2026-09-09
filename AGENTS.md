@@ -30,6 +30,13 @@ Elementos existentes: `anydesk`, `defprof`, `glpi`, `office`, `sysinternals`, `w
 - **Shell objetivo**: los scripts se ejecutan vía **Windows PowerShell 5.1** (los `.cmd` lanzadores invocan `powershell`). **Decisión 2026-09-09: NO migrar a pwsh.** No asumir compatibilidad con PowerShell 7/6 (`ConvertFrom-Json` rompe en silencio con 5.1 si no se normaliza el resultado a array). El usuario corre los scripts desde la PC cliente con este flujo.
 - **Límite del repo**: agnóstico — sin credenciales, sin datos de clientes, sin infraestructura iGeek.
 
+## Convenciones de scripts (obligatorias para todo elemento)
+
+- **Idempotencia / verificación previa**: el script debe **verificar si el objetivo ya está cumplido** (binario bajado, app instalada, tweak aplicado) **antes** de ejecutar. Si ya está, avisarlo y ofrecer continuar/re-hacer con confirmación explícita (`Read-Host "Re-hacer? (S/N)"`), no ejecutar a ciegas.
+- **Resultado final visible**: al terminar, el script debe dejar **registro claro de qué hizo y dónde quedó** (path del binario/instalación), no solo "listo". Si hay un siguiente paso de verificación para el operador, mostrarlo. Ej.: "Autologon instalado en: C:\...\Autologon64.exe | Abrir ahora? (S/N)".
+- **Pausa final**: terminar con `Read-Host`/`pause` para que el resultado quede en pantalla antes de volver al menú (el menú hace `Clear-Host` al volver).
+- **Origen**: marcado por el usuario 2026-09-09 sobre `sysinternals/scripts/autologon-install.ps1` (descargaba sin verificar y no dejaba registro del resultado). Aplicar a todos los elementos existentes y futuros.
+
 ## Git / flujo de trabajo
 
 - `main` es sagrado: **no se trabaja en main**.
