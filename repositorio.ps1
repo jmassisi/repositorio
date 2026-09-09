@@ -82,7 +82,7 @@ function Descargar {
         if (Test-Path $dest) { Copy-Item "$($_.FullName)\*" $dest -Recurse -Force -EA 0 }
     }
     Remove-Item $logsBak -Recurse -Force -EA 0
-    Remove-Item "$d\.gitignore","$d\PENDIENTES.md" -Force -EA 0
+    Remove-Item "$d\.gitignore","$d\PENDIENTES.md","$d\AGENTS.md" -Force -EA 0
     Get-ChildItem $d -Recurse -Filter '.gitkeep' | Remove-Item -Force -EA 0
     Log "Descargar: fin OK"
 }
