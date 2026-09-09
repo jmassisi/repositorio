@@ -43,17 +43,6 @@ function Descargar {
     Copy-Item "$d\*\logs" $logsBak -Recurse -Force -EA 0
     Log "logs actuales respaldados en $logsBak"
 
-    if (Test-Path $d) {
-        $bkp = "C:\repositorio_bkp_$(Get-Date -Format 'yyyy-MM-dd_HHmmss')"
-        try {
-            Rename-Item $d $bkp -Force
-            Log "OK: $d -> $bkp"
-        } catch {
-            Log "ERROR renombrando ${d}: $($_.Exception.Message)"
-            throw
-        }
-    }
-
     Log "descargando main.zip..."
     irm https://github.com/jmassisi/repositorio/archive/refs/heads/main.zip -OutFile $z
     Log "zip: $z ($((Get-Item $z).Length) bytes)"
@@ -61,8 +50,31 @@ function Descargar {
     Expand-Archive $z "$env:TEMP\rextract" -Force
     Log "extraido hacia $env:TEMP\rextract"
 
-    Move-Item "$env:TEMP\rextract\repositorio-main" $d -Force
-    Log "movido repositorio-main -> $d"
+    $renamed = $false
+    if (Test-Path $d) {
+        $bkp = "C:\repositorio_bkp_$(Get-Date -Format 'yyyy-MM-dd_HHmmss')"
+        if (Test-Path $bkp) { Rename-Item $bkp "$bkp.old" -Force }
+        try {
+            Rename-Item $d $bkp -Force
+            Log "OK: rename $d -> $bkp"
+            $renamed = $true
+        } catch {
+            $renamed = $false
+            Log "aviso: rename fallo (${d} en uso): $($_.Exception.Message) -> sync robocopy"
+        }
+        if (-not $renamed) {
+            robocopy $d $bkp /E /H /R:1 /W:1 /NFL /NDL /NJH /NJS | Out-Null
+            Log "OK: bkp por copia $d -> $bkp (solo sobrevive a carpeta en uso)"
+        }
+    }
+
+    if ($renamed -or -not (Test-Path $d)) {
+        Move-Item "$env:TEMP\rextract\repositorio-main" $d -Force
+        Log "movido repositorio-main -> $d"
+    } else {
+        robocopy "$env:TEMP\rextract\repositorio-main" $d /MIR /R:1 /W:1 /NFL /NDL /NJH /NJS | Out-Null
+        Log "sync robocopy repositorio-main -> $d"
+    }
 
     Remove-Item "$env:TEMP\rextract",$z -Recurse -Force
     Get-ChildItem $logsBak -Directory -EA 0 | ForEach-Object {
