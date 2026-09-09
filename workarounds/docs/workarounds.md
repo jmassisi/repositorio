@@ -3,10 +3,6 @@
 > **Esto es un workaround de esta maquina/alias. NO repara el sistema.**
 > Aplica cuando `winget` no resuelve en la terminal (`where.exe winget` no encuentra nada)
 > pero el motor real existe (via `Get-AppxPackage Microsoft.DesktopAppInstaller`).
->
-> **Estado de merge — PENDIENTE DE DECISION.** Este documento y su script viven en la
-> rama `fix/winget-fallback`. La decision de mergearlos a `main` (o descartarlos) queda
-> abierta adrede: codifican una excepcion de una sola maquina, no una solucion general.
 
 ## Síntoma
 
@@ -41,7 +37,7 @@ agregada al **PATH de usuario**.
 Aplicar con un solo comando (no requiere admin):
 
 ```powershell
-pwsh -NoProfile -File "C:\repositorio\winget\scripts\fix-alias-winget.ps1"
+pwsh -NoProfile -File "C:\repositorio\workarounds\scripts\fix-alias-winget.ps1"
 ```
 
 Verificación (en terminal **nueva**, el PATH no se refresca en la abierta):
@@ -91,6 +87,6 @@ Aplica el workaround primero (rapido, reversible) y deja el fix real como opcion
 
 ## Versiones/contexto validado
 
-- El shim y `fix-alias-winget.ps1` se aplican con **pwsh** (PowerShell 7), que es la shell personal del usuario. Con 5.1 el parseo de JSON rompe en silencio; por eso este script usa `-Raw` + normalización a array (ver `instalar-aplicaciones.ps1`).
+- El shim y `fix-alias-winget.ps1` se aplican con **pwsh** (PowerShell 7), que es la shell personal del usuario. Con 5.1 el parseo de JSON rompe en silencio; por eso ese script usa `-Raw` + normalización a array (ver `instalar-aplicaciones.ps1`).
 - Motor winget v1.29.290 validado funcionando con este workaround.
 - **Decisión 2026-09-09:** los lanzadores `.cmd` del repo se mantienen en Windows PowerShell 5.1 (no se migra a pwsh).
