@@ -27,7 +27,7 @@ while ($true) {
     }
     Write-Host "----------------------------"
     Write-Host ""
-    $rutas = Get-ChildItem "C:\repositorio\*\scripts\*.ps1" | Where-Object { $_.Name -notmatch "check" }
+    $rutas = Get-ChildItem "C:\repositorio\*\scripts\*.ps1" | Where-Object { $_.Name -notmatch "check" -and $_.Name -notmatch "^fix-" }
     $utilidades = $rutas | Group-Object { $_.Directory.Parent.Name } | Sort-Object Name
     $i = 1
     $utilidades | ForEach-Object { Write-Host "[$i] $($_.Name)"; $i++ }

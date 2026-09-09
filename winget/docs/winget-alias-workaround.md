@@ -91,6 +91,6 @@ Aplica el workaround primero (rapido, reversible) y deja el fix real como opcion
 
 ## Versiones/contexto validado
 
-- El shim y `fix-alias-winget.ps1` se aplican con **pwsh** (PowerShell 7), que es la shell personal del usuario. Con 5.1 el parseo de JSON rompe en silencio; por eso este script usa `-Raw` + normalización a array (ver `instalar-winget.ps1`).
+- El shim y `fix-alias-winget.ps1` se aplican con **pwsh** (PowerShell 7), que es la shell personal del usuario. Con 5.1 el parseo de JSON rompe en silencio; por eso este script usa `-Raw` + normalización a array (ver `instalar-aplicaciones.ps1`).
 - Motor winget v1.29.290 validado funcionando con este workaround.
 - **Decisión 2026-09-09:** los lanzadores `.cmd` del repo se mantienen en Windows PowerShell 5.1 (no se migra a pwsh).
