@@ -51,7 +51,8 @@ if (-not (Test-Path $appsJson)) {
     exit 1
 }
 
-$apps = @(Get-Content -Raw $appsJson -Encoding UTF8 | ConvertFrom-Json)
+$apps = Get-Content -Raw $appsJson -Encoding UTF8 | ConvertFrom-Json
+if ($apps -isnot [System.Array]) { $apps = @($apps) }
 if ($apps.Count -eq 0) {
     Write-Host "`n   [-] apps.json no tiene aplicaciones." -ForegroundColor Red
     Read-Host "`nPresiona Enter para cerrar"
