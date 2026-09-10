@@ -20,8 +20,8 @@
 
 | Archivo | Descripción |
 |---|---|
-| `instalar-glpi-agent.cmd` | Lanzador. Eleva privilegios y ejecuta el `.ps1` |
-| `instalar-glpi-agent.ps1` | Script principal de instalación |
+| `glpi-agent.cmd` | Lanzador. Eleva privilegios y ejecuta el `.ps1` |
+| `glpi-agent.ps1` | Script principal de instalación |
 
 > [!IMPORTANT]
 > Ambos archivos deben estar en el mismo directorio. Ejecutar únicamente el `.cmd`.
@@ -30,7 +30,7 @@
 
 ## Método 1 — Instalación con script (recomendada)
 
-1. Copiar `instalar-glpi-agent.cmd` e `instalar-glpi-agent.ps1` al equipo destino.
+1. Copiar `glpi-agent.cmd` e `glpi-agent.ps1` al equipo destino.
 2. Ejecutar con clic derecho sobre el `.cmd` → **Ejecutar como administrador**.
 
 El script realiza automáticamente:

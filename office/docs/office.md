@@ -1,7 +1,7 @@
 # Instalacion de Microsoft Office en Windows
 
 **Version del documento:** 1.2
-**Scripts incluidos:** instalar-office.cmd / instalar-office.ps1
+**Scripts incluidos:** office.cmd / office.ps1
 **Sistema operativo:** Windows 10/11 - Windows Server 2016+ (64 bits)
 **Requiere:** PowerShell 5.1+, privilegios de administrador, acceso a internet (modo online)
 
@@ -28,8 +28,8 @@ El script detecta instalaciones previas de Office y ofrece desinstalarlas limpia
 
 | Archivo | Descripcion |
 |---|---|
-| instalar-office.cmd | Lanzador. Eleva privilegios y ejecuta el .ps1 en una sola ventana de PowerShell |
-| instalar-office.ps1 | Script principal. ODT, deteccion, desinstalacion, menu, instalacion y log |
+| office.cmd | Lanzador. Eleva privilegios y ejecuta el .ps1 en una sola ventana de PowerShell |
+| office.ps1 | Script principal. ODT, deteccion, desinstalacion, menu, instalacion y log |
 | xml\ | Carpeta con los perfiles de instalacion en formato .xml |
 | logs\ | Carpeta con los registros de cada ejecucion |
 
@@ -39,8 +39,8 @@ El script detecta instalaciones previas de Office y ofrece desinstalarlas limpia
 
 ```
 office\
-├── instalar-office.cmd
-├── instalar-office.ps1
+├── office.cmd
+├── office.ps1
 ├── xml\
 │   ├── configuracion01.xml
 │   └── (otros perfiles...)
@@ -153,7 +153,7 @@ Hacer clic en Exportar y guardar el .xml. Copiarlo a la carpeta xml\ del script 
 
 1. Copiar la carpeta office\ completa al equipo destino.
 2. Colocar el XML de instalacion deseado en la subcarpeta xml\.
-3. Hacer doble clic sobre instalar-office.cmd.
+3. Hacer doble clic sobre office.cmd.
 4. Aceptar la elevacion de privilegios (UAC).
 5. Seguir el menu interactivo.
 

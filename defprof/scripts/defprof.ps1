@@ -1,4 +1,4 @@
-# actualizar-default.ps1
+# defprof.ps1
 # Ejecuta defprof sobre el usuario molde elegido
 # Usa defprof.exe desde C:\repositorio\defprof\bin\ con verificacion de integralidad
 # Requiere: ejecutar como Administrador | Log en: C:\repositorio\logs\defprof\
@@ -25,7 +25,7 @@ function Write-Log {
 
 # ── Header ───────────────────────────────────────────────────
 Add-Content -Path $logFile -Value "================================================" -Encoding UTF8
-Add-Content -Path $logFile -Value " actualizar-default  |  $ts"                      -Encoding UTF8
+Add-Content -Path $logFile -Value " defprof  |  $ts"                      -Encoding UTF8
 Add-Content -Path $logFile -Value " Host   : $env:COMPUTERNAME"                      -Encoding UTF8
 Add-Content -Path $logFile -Value " Usuario: $env:USERDOMAIN\$env:USERNAME"          -Encoding UTF8
 Add-Content -Path $logFile -Value "================================================" -Encoding UTF8

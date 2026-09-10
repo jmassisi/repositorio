@@ -43,14 +43,14 @@ irm repositorio.igeek.ar | iex
 
 | Carpeta | Contenido | Documentación |
 |---|---|---|
-| `anydesk/` | Reset de ID y configuración de AnyDesk | [anydesk-reset.md](anydesk/docs/anydesk-reset.md) |
-| `defprof/` | Perfil por defecto con DefProf | [defprof-perfil-default.md](defprof/docs/defprof-perfil-default.md) |
-| `glpi/` | Agente y script de instalación | [glpi-agent-instalacion.md](glpi/docs/glpi-agent-instalacion.md) |
-| `office/` | Instalación desatendida de Office | [instalar-office.md](office/docs/instalar-office.md) |
+| `anydesk/` | Reset de ID y configuración de AnyDesk | [anydesk.md](anydesk/docs/anydesk.md) |
+| `defprof/` | Perfil por defecto con DefProf | [defprof.md](defprof/docs/defprof.md) |
+| `glpi/` | Agente y script de instalación | [glpi-agent.md](glpi/docs/glpi-agent.md) |
+| `office/` | Instalación desatendida de Office | [office.md](office/docs/office.md) |
 | `scripts/sistema` | Scripts de optimización y configuración del sistema | — |
 | `scripts/drivers` | Backup y restauración de drivers | — |
 | `sysinternals/` | Herramientas de Sysinternals (autologon) | — |
-| `winget/` | Instalación de aplicaciones vía Winget desde lista | [winget-instalar.md](winget/docs/winget-instalar.md) |
+| `winget/` | Instalación de aplicaciones vía Winget desde lista | [winget.md](winget/docs/winget.md) |
 | `workarounds/` | Workarounds puntuales (fix de alias winget, etc.) | [workarounds.md](workarounds/docs/workarounds.md) |
 | `zabbix/` | Agente y configuración de monitoreo | — |
 | `registro/` | Tweaks de registro (.reg) | — |

@@ -1,4 +1,4 @@
-# fix-alias-winget.ps1
+# fix-winget-alias.ps1
 # WORKAROUND: repara el comando winget cuando el alias de WindowsApps esta roto.
 # NO toca el sistema: crea un shim (winget.cmd) en %USERPROFILE%\bin y agrega
 # esa carpeta al PATH de usuario. No requiere admin.

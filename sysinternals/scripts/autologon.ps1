@@ -1,4 +1,4 @@
-# autologon-install.ps1
+# autologon.ps1
 # Descarga Autologon y Autologon64 de Sysinternals a C:\repositorio\sysinternals\autologon\
 # Idempotente: si los binarios ya existen, avisa y pregunta si re-descargar.
 
@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Continue'
 $ts      = Get-Date -Format 'yyyy-MM-dd_HHmmss'
 $destDir = 'C:\repositorio\sysinternals\autologon'
 $logDir  = "$destDir\logs"
-$logFile = "$logDir\instalar-autologon_$ts.log"
+$logFile = "$logDir\autologon_$ts.log"
 
 if (-not (Test-Path $logDir)) { New-Item $logDir -ItemType Directory -Force | Out-Null }
 
@@ -41,7 +41,7 @@ function Abrir-Autologon {
 }
 
 Add-Content -Path $logFile -Value "================================================" -Encoding UTF8
-Add-Content -Path $logFile -Value " instalar-autologon  |  $ts"                       -Encoding UTF8
+Add-Content -Path $logFile -Value " autologon  |  $ts"                       -Encoding UTF8
 Add-Content -Path $logFile -Value " Host   : $env:COMPUTERNAME"                       -Encoding UTF8
 Add-Content -Path $logFile -Value " Usuario: $env:USERDOMAIN\$env:USERNAME"           -Encoding UTF8
 Add-Content -Path $logFile -Value "================================================" -Encoding UTF8

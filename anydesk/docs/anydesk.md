@@ -1,7 +1,7 @@
 # Reset AnyDesk en Windows
 
 **Versión del documento:** 2.0
-**Scripts incluidos:** anydesk-reset.ps1 / anydesk-reset.cmd
+**Scripts incluidos:** anydesk.ps1 / anydesk.cmd
 
 ---
 
@@ -24,8 +24,8 @@ Solución para resetear el ID y la configuración de AnyDesk en equipos Windows.
 
 | Archivo | Descripción |
 |---|---|
-| `anydesk-reset.ps1` | Script principal. Detección, kill, reset, backup, restore y log |
-| `anydesk-reset.cmd` | Lanzador. Eleva privilegios y ejecuta el `.ps1` |
+| `anydesk.ps1` | Script principal. Detección, kill, reset, backup, restore y log |
+| `anydesk.cmd` | Lanzador. Eleva privilegios y ejecuta el `.ps1` |
 
 > [!IMPORTANT]
 > Ambos archivos deben estar en el mismo directorio. El usuario debe ejecutar únicamente el `.cmd`.
@@ -34,8 +34,8 @@ Solución para resetear el ID y la configuración de AnyDesk en equipos Windows.
 
 ## Uso
 
-1. Copiar `anydesk-reset.ps1` y `anydesk-reset.cmd` al equipo destino.
-2. Hacer doble clic sobre `anydesk-reset.cmd`.
+1. Copiar `anydesk.ps1` y `anydesk.cmd` al equipo destino.
+2. Hacer doble clic sobre `anydesk.cmd`.
 3. Aceptar la elevación de privilegios (UAC).
 4. El script se ejecuta automáticamente y relanza AnyDesk al finalizar.
 
