@@ -1,4 +1,4 @@
-# anydesk-reset.ps1 - v5
+# anydesk.ps1 - v5
 # Agnostico de idioma, path, instalado o standalone
 # - NTP al inicio para corregir hora antes de cualquier accion
 # - Deteccion por ProductName (cubre exe renombrado)
@@ -38,7 +38,7 @@ $totalSteps = 6
 
 # -- Header del log -------------------------------------------
 Add-Content -Path $logFile -Value "================================================" -Encoding UTF8
-Add-Content -Path $logFile -Value (" anydesk-reset  |  " + $ts)                      -Encoding UTF8
+Add-Content -Path $logFile -Value (" anydesk  |  " + $ts)                      -Encoding UTF8
 Add-Content -Path $logFile -Value (" Host   : " + $env:COMPUTERNAME)                  -Encoding UTF8
 Add-Content -Path $logFile -Value (" Usuario: " + $env:USERDOMAIN + "\" + $env:USERNAME) -Encoding UTF8
 Add-Content -Path $logFile -Value "================================================" -Encoding UTF8

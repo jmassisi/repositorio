@@ -1,6 +1,6 @@
 #Requires -RunAsAdministrator
 # ============================================================
-#  glpi-agent-install.ps1 - Instalacion silenciosa - GLPI Agent
+#  glpi-agent.ps1 - Instalacion silenciosa - GLPI Agent
 #  Servidor: configurable al ejecutar
 #  Version: 3.0  (2026-04-30)
 # ============================================================

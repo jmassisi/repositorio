@@ -1,5 +1,5 @@
 @echo off
-:: Lanzador de autologon-install.ps1
+:: Lanzador de defprof.ps1
 :: Eleva privilegios y bypasea ExecutionPolicy sin cambiarla globalmente
 
 net session >nul 2>&1
@@ -9,5 +9,5 @@ if errorlevel 1 (
     exit /b
 )
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0autologon-install.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0defprof.ps1"
 pause

@@ -1,7 +1,7 @@
 # Reparación del menú Win + X post-defprof
 
 **Versión del documento:** 1.1
-**Herramienta:** Fix-WinX (reparación complementaria de [perfil por defecto con DefProf](defprof-perfil-default.md))
+**Herramienta:** Fix-WinX (reparación complementaria de [perfil por defecto con DefProf](defprof.md))
 **Sistema operativo:** Windows 10/11
 
 ---

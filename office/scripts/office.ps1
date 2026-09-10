@@ -1,4 +1,4 @@
-# Instalar-Office.ps1 - v1.2
+# office.ps1 - v1.2
 # Instalacion de Microsoft 365 Apps via Office Deployment Tool (ODT)
 # - Deteccion y actualizacion automatica del ODT
 # - Menu de seleccion de XML dinamico (lee carpeta xml\)

@@ -34,8 +34,8 @@ DefProf convierte un usuario real en la plantilla que Windows usa para crear tod
 | Archivo | Descripción |
 |---|---|
 | `bin\defprof.exe` | Binario de DefProf, versionado y verificado (SHA-256 + firma Authenticode) en cada ejecución. Hash SHA-256: `1a0574aeca4b95c3aa54813182ca41254f15f32fddfe0406756759bca0fc5949` |
-| `actualizar-default.ps1` | Lista usuarios locales, verifica integridad de `defprof.exe` y ejecuta DefProf sobre el molde elegido |
-| `actualizar-default.cmd` | Lanzador. Eleva privilegios y ejecuta el `.ps1` |
+| `defprof.ps1` | Lista usuarios locales, verifica integridad de `defprof.exe` y ejecuta DefProf sobre el molde elegido |
+| `defprof.cmd` | Lanzador. Eleva privilegios y ejecuta el `.ps1` |
 | `fix-winx.ps1` | Repara el menú Win + X post-defprof: copia accesos directos ocultos desde un usuario funcional hacia la plantilla `Default` (ver [fix-winx.md](fix-winx.md)) |
 | `fix-winx.cmd` | Lanzador de `fix-winx.ps1`. Eleva privilegios y ejecuta el `.ps1` |
 
@@ -103,7 +103,7 @@ A partir de este momento, cualquier usuario nuevo que se cree en la PC nace como
 ## Paso 3 — Actualizar el molde con los cambios
 
 1. Iniciar sesión en el usuario molde (u otra cuenta admin distinta al usuario a capturar).
-2. Ejecutar la opción **actualizar-default** del menú del repositorio (`C:\repositorio\menu.cmd`), o directamente su lanzador `C:\repositorio\defprof\scripts\actualizar-default.cmd`.
+2. Ejecutar la opción **defprof** del menú del repositorio (`C:\repositorio\menu.cmd`), o directamente su lanzador `C:\repositorio\defprof\scripts\defprof.cmd`.
 3. Seleccionar el usuario a capturar cuando el script lo solicite.
 4. A partir de este momento, cualquier usuario nuevo hereda ese estado.
 
@@ -115,7 +115,7 @@ A partir de este momento, cualquier usuario nuevo que se cree en la PC nace como
 ## Ciclo de actualización
 
 ```
-Configurar molde → Cerrar sesión → Entrar a otra cuenta admin → ejecutar actualizar-default (menú)
+Configurar molde → Cerrar sesión → Entrar a otra cuenta admin → ejecutar defprof (menú)
 ```
 
 Cada vez que se quiera actualizar el estándar:
@@ -125,7 +125,7 @@ Cada vez que se quiera actualizar el estándar:
 3. Limpiar credenciales e historial.
 4. Cerrar sesión.
 5. Entrar a cualquier otra cuenta admin.
-6. Ejecutar la opción **actualizar-default** del menú (`C:\repositorio\menu.cmd`) y elegir el usuario molde.
+6. Ejecutar la opción **defprof** del menú (`C:\repositorio\menu.cmd`) y elegir el usuario molde.
 
 ---
 
@@ -142,7 +142,7 @@ Cada vez que se quiera actualizar el estándar:
 
 ## Verificación de integridad
 
-Antes de cada ejecución, `actualizar-default.ps1` comprueba `bin\defprof.exe`:
+Antes de cada ejecución, `defprof.ps1` comprueba `bin\defprof.exe`:
 
 | Check | Mecanismo |
 |---|---|
