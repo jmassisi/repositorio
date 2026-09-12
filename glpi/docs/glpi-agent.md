@@ -1,7 +1,7 @@
 # Instalación del Agente GLPI en Windows
 
-**Versión del documento:** 2.0  
-**GLPI Server:** https://soporte.ejemplo.com  
+**Versión del documento:** 2.1  
+**GLPI Server:** https://servidor.example.com  
 **Versión GLPI:** 11.0.6  
 **Versión agente:** 1.17  
 
@@ -12,7 +12,7 @@
 - Windows 10/11 o Windows Server 2016+ (64 bits)
 - Privilegios de administrador local
 - Acceso a internet (descarga desde github.com)
-- Acceso de red al servidor GLPI (`https://soporte.ejemplo.com`)
+- Acceso de red al servidor GLPI (`https://servidor.example.com`)
 
 ---
 
@@ -35,19 +35,34 @@
 
 El script realiza automáticamente:
 
-- Detección de versión instalada — si ya existe una versión previa, avisa y solicita confirmación antes de desinstalar.
-- Descarga del instalador desde GitHub.
+- Detección de versión instalada vs. disponible (via `winget show`).
+- Si ya existe una versión previa, ofrece cambiar solo el servidor **sin reinstalar** (opción 1) o reinstalar/actualizar el agente (opción 2).
 - Pregunta interactiva para instalar el ícono de bandeja (AGENTMONITOR).
-- Instalación silenciosa del agente.
+- Instalación silenciosa del agente via `winget` (última versión disponible).
 - Envío forzado de inventario al servidor GLPI.
 - Generación de inventario local XML en `C:\repositorio\GLPI\logs\`.
 - Creación de accesos directos a la interfaz local del agente en `C:\repositorio\GLPI\`.
 
 > [!NOTE]
-> La versión del agente está fijada en el script (`$GLPI_AGENT_VERSION`). Para actualizar, modificar esa variable antes de ejecutar.
+> El agente se instala con `winget` en su última versión disponible; no hay versión fijada en el script.
 
 > [!NOTE]
 > Desde la versión 1.8 en adelante, solo se distribuye instalador de 64 bits.
+
+---
+
+## Cambiar el servidor GLPI sin reinstalar
+
+Si el agente ya está instalado y solo hay que cambiar la URL del servidor:
+
+1. Ejecutar `glpi-agent.cmd` como administrador.
+2. Ingresar la nueva URL del servidor.
+3. En el menú de detección, elegir **`[1] Solo cambiar servidor (sin reinstalar)`**.
+
+El script actualiza el valor `server` en el registro (`HKLM\SOFTWARE\GLPI-Agent` y su variante 32-bit si existe), reinicia el servicio `GLPI-Agent` y fuerza el envío de inventario. No modifica la instalación actual, AGENTMONITOR ni los accesos directos.
+
+> [!TIP]
+> Si la URL ingresada es la misma que la ya configurada, el script lo avisa y pregunta si re-hacer (forzar inventario) o salir.
 
 ---
 
@@ -61,7 +76,7 @@ El script realiza automáticamente:
 
 ```cmd
 msiexec /i "GLPI-Agent-X.XX-x64.msi" /quiet /norestart ^
-  SERVER="https://soporte.ejemplo.com" ^
+  SERVER="https://servidor.example.com" ^
   RUNNOW=1 ^
   EXECMODE=1 ^
   ADD_FIREWALL_EXCEPTION=1 ^
@@ -72,7 +87,7 @@ msiexec /i "GLPI-Agent-X.XX-x64.msi" /quiet /norestart ^
 
 | Parámetro | Valor | Descripción |
 |---|---|---|
-| `SERVER` | `https://soporte.ejemplo.com` | URL del servidor GLPI |
+| `SERVER` | `https://servidor.example.com` | URL del servidor GLPI |
 | `RUNNOW` | `1` | Ejecuta el inventario inmediatamente al finalizar la instalación |
 | `EXECMODE` | `1` | Corre el agente como servicio de Windows (inicio automático) |
 | `ADD_FIREWALL_EXCEPTION` | `1` | Agrega excepción en el firewall de Windows |
@@ -97,7 +112,7 @@ msiexec /i "GLPI-Agent-X.XX-x64.msi" /quiet /norestart ^
 5. **Selección de componentes** — Dejar la selección por defecto. Clic en **Next**.
 
 6. **Configuración del servidor:**
-   - **Server URL:** `https://soporte.ejemplo.com`
+   - **Server URL:** `https://servidor.example.com`
    - Clic en **Next**.
 
 7. **Modo de ejecución** — Seleccionar **Service (Recommended)**. Clic en **Next**.
@@ -143,7 +158,7 @@ Generado automáticamente por el script al finalizar la instalación.
 
 ### En el servidor GLPI
 
-1. Ingresar a `https://soporte.ejemplo.com` con credenciales de administrador.
+1. Ingresar a `https://servidor.example.com` con credenciales de administrador.
 2. Ir a **Activos → Computadoras**.
 3. Buscar el equipo por nombre de host o dirección IP.
 4. Verificar que:
@@ -152,7 +167,7 @@ Generado automáticamente por el script al finalizar la instalación.
    - Los datos de hardware (RAM, CPU, disco) están completos.
 
 > [!TIP]
-> Si el equipo no aparece en los primeros 5 minutos, verificar conectividad hacia `https://soporte.ejemplo.com` y revisar la interfaz local del agente en `http://localhost:62354`.
+> Si el equipo no aparece en los primeros 5 minutos, verificar conectividad hacia `https://servidor.example.com` y revisar la interfaz local del agente en `http://localhost:62354`.
 
 ---
 
