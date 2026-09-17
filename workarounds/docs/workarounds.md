@@ -90,3 +90,64 @@ Aplica el workaround primero (rapido, reversible) y deja el fix real como opcion
 - El shim y `fix-winget-alias.ps1` se aplican con **pwsh** (PowerShell 7), que es la shell personal del usuario. Con 5.1 el parseo de JSON rompe en silencio; por eso ese script usa `-Raw` + normalización a array (ver `winget.ps1`).
 - Motor winget v1.29.290 validado funcionando con este workaround.
 - **Decisión 2026-09-09:** los lanzadores `.cmd` del repo se mantienen en Windows PowerShell 5.1 (no se migra a pwsh).
+
+---
+
+# WORKAROUND — Ocultar "3D Objects" del Explorador (Windows 10)
+
+Combina dos acciones en un solo script:
+
+1. **Hide (registro):** borra la key del CLSID `{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}`
+   del namespace de "Este equipo" en `HKLM` y `WOW6432Node`. Es el mismo efecto que
+   el `Hide_3D_Objects.reg` original (referencia en `origen/`, solo local — NO llega al cliente).
+2. **Limpieza:** elimina la carpeta fisica `%USERPROFILE%\3D Objects` de cada perfil,
+   **solo si esta vacia**.
+
+> **Solo Windows 10.** En Windows 11 el icono ya no existe: el script detecta el OS
+> (exige `ProductName -like 'Windows 10*'` y build `< 22000`) y aborta si no aplica.
+> Perfiles en ingles (sistema US): la carpeta se busca literalmente `3D Objects`.
+
+## Uso
+
+Desde el menu (`menu.ps1` → `workarounds` → `hide-3d-objects (Windows 10 only)`) o directo:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\scripts\hide-3d-objects.ps1"
+```
+
+Requiere **Administrador** (borra claves en `HKLM`). El lanzador `hide-3d-objects.cmd`
+eleva automaticamente si se ejecuta sin permisos.
+
+## Comportamiento de seguridad
+
+- Si alguna carpeta `3D Objects` tiene **contenido** (archivos del usuario), el script
+  **ABORTA todo**: no borra la carpeta ni oculta el icono, y lista qué encontró.
+  Evita perder datos (ej. modelos `.stl`/`.3mf`) de un perfil que no es nuevo.
+- Idempotencia: si ya esta aplicado (sin keys y sin carpetas), pide "Re-hacer? (S/N)".
+- El icono desaparece al refrescar/reabrir el Explorador; si persiste, reiniciar
+  Explorer o cerrar sesion (no se toca en el script).
+
+## Qué toca y qué no
+
+| | |
+|---|---|
+| Borra (registro) | `HKLM\...\MyComputer\NameSpace\{0DB7E03F-...}` y su `WOW6432Node` |
+| Borra (disco) | `C:\Users\*\3D Objects` **vacia** de cada perfil |
+| Genera (por corrida) | log `logs/hide-3d-objects_<ts>.log` + `.reg` de restauracion `logs/hide-3d-objects-restore_<ts>.reg` |
+| NO toca | datos del usuario con contenido, perfiles `Default`/`Public`/`All Users`, Windows 11 | 
+
+## Deshacer
+
+Importar el `.reg` de restauracion generado en `C:\repositorio\workarounds\logs\`
+(re-crea las dos keys de registro; el icono vuelve a aparecer).
+
+```powershell
+reg import "C:\repositorio\workarounds\logs\hide-3d-objects-restore_<ts>.reg"
+```
+
+## Referencia de origen
+
+El `Hide_3D_Objects.reg` original (de `D:\Backups\2026-01-10 - geekom...`) se mantiene
+en `origen/` (ignorado por git y **no se despliega al cliente**). El script implementa
+su mismo efecto via PowerShell (permite el abort por contenido, logs y verificaciones que
+un `.reg` puro no puede).
