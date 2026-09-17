@@ -123,6 +123,8 @@ eleva automaticamente si se ejecuta sin permisos.
 - Si alguna carpeta `3D Objects` tiene **contenido** (archivos del usuario), el script
   **ABORTA todo**: no borra la carpeta ni oculta el icono, y lista qué encontró.
   Evita perder datos (ej. modelos `.stl`/`.3mf`) de un perfil que no es nuevo.
+  El `desktop.ini` de la carpeta (que crea Windows para localizar el nombre) **no
+  cuenta como contenido**: la carpeta con solo `desktop.ini` se considera vacia.
 - Idempotencia: si ya esta aplicado (sin keys y sin carpetas), pide "Re-hacer? (S/N)".
 - El icono desaparece al refrescar/reabrir el Explorador; si persiste, reiniciar
   Explorer o cerrar sesion (no se toca en el script).

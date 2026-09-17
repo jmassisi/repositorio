@@ -44,6 +44,11 @@ Write-Host "   [+] Windows 10 detectado (build $build)" -ForegroundColor Green
 Write-Log "OS OK: $($nt.ProductName) (build $build)"
 
 # --- 2. Escanear perfiles: abortar si alguna carpeta tiene contenido ---
+function Get-3DContent {
+    param([string]$Path)
+    Get-ChildItem -LiteralPath $Path -Force -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -ne 'desktop.ini' }
+}
 $excluir = @('Default', 'Default User', 'Public', 'All Users')
 $perfiles = Get-ChildItem 'C:\Users' -Directory -ErrorAction SilentlyContinue |
     Where-Object { $_.Name -notin $excluir }
@@ -58,14 +63,14 @@ if ($carpetas.Count -eq 0) {
     Write-Log "Sin carpetas '3D Objects' en C:\Users"
 }
 
-$conContenido = @($carpetas | Where-Object { @(Get-ChildItem $_ -Force -ErrorAction SilentlyContinue | Select-Object -First 1).Count -gt 0 })
+$conContenido = @($carpetas | Where-Object { @(Get-3DContent $_ | Select-Object -First 1).Count -gt 0 })
 if ($conContenido.Count -gt 0) {
     Write-Host "`n   [-] Se ABORTA. Hay carpetas '3D Objects' con contenido:" -ForegroundColor Red
     foreach ($carpeta in $conContenido) {
         Write-Host "       $carpeta" -ForegroundColor Yellow
-        Get-ChildItem $carpeta -Force -ErrorAction SilentlyContinue | Select-Object -First 5 |
+        Get-3DContent $carpeta | Select-Object -First 5 |
             ForEach-Object { Write-Host "           - $($_.Name)" -ForegroundColor DarkGray }
-        if (@(Get-ChildItem $carpeta -Force -ErrorAction SilentlyContinue).Count -gt 5) {
+        if (@(Get-3DContent $carpeta).Count -gt 5) {
             Write-Host "           - ... (y mas archivos)" -ForegroundColor DarkGray
         }
     }
