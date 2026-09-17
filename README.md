@@ -32,6 +32,9 @@ Compara la fecha local de `C:\repositorio` contra el último commit en GitHub. S
 .\check.ps1
 ```
 
+**Historial de cambios**  
+Ver [CHANGELOG.md](CHANGELOG.md). Se agrupa por fecha (cada entrada = sesión/merges a `main`) y se actualiza al cerrar sesión.
+
 **Actualizar el repositorio** (`repositorio.ps1`)  
 Descarga la última versión desde GitHub, preserva los logs de todos los elementos, limpia archivos de infraestructura y abre la carpeta al finalizar. Se ejecuta automáticamente al correr el comando de despliegue.
 
