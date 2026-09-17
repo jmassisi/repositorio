@@ -65,7 +65,13 @@ while ($true) {
             Write-Host "================================="
             Write-Host ""
             $j = 1
-            $utilidad.Group | ForEach-Object { Write-Host "[$j] $($_.BaseName)"; $j++ }
+            $utilidad.Group | ForEach-Object {
+                $nombre = $_.BaseName
+                $head = Get-Content -Path $_.FullName -TotalCount 10 -ErrorAction SilentlyContinue |
+                    Where-Object { $_ -match '^#\s*menu:\s*(.+)$' } | Select-Object -First 1
+                if ($head -and $head -match '^#\s*menu:\s*(.+)$') { $nombre = $Matches[1] }
+                Write-Host "[$j] $nombre"; $j++
+            }
             Write-Host ""
             Write-Host "[0] Volver"
             Write-Host ""

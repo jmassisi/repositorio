@@ -47,3 +47,6 @@ LOG/
 Smart/
 Data/
 temp_ccupdate/
+
+# ── Referencias de origen (solo local, no llegan al cliente) ──
+origen/
