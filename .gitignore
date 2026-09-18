@@ -38,6 +38,9 @@ office/logs/**
 !office/logs/**/.gitkeep
 zabbix/logs/**
 !zabbix/logs/**/.gitkeep
+workarounds/logs/**
+!workarounds/logs/**/.gitkeep
+workarounds/nwinfo/**
 
 # ── Office Deployment Tool ───────────────────────────────────
 office/scripts/officedeploymenttool*.exe
