@@ -153,3 +153,85 @@ El `Hide_3D_Objects.reg` original (de `D:\Backups\2026-01-10 - geekom...`) se ma
 en `origen/` (ignorado por git y **no se despliega al cliente**). El script implementa
 su mismo efecto via PowerShell (permite el abort por contenido, logs y verificaciones que
 un `.reg` puro no puede).
+---
+
+# WORKAROUND — Corrección de memoria RAM en inventario GLPI vía SPD real (NWinfo)
+
+> **Para BIOS viejas que reportan memoria mal por SMBIOS** (ej. placa de la PC de
+> banco que dice DDR2 cuando el módulo real es DDR3 SO-DIMM).
+
+## Problema
+
+El GLPI Agent genera el <MEMORIES> de su inventario desde la información SMBIOS
+(Win32_PhysicalMemory / tabla 17), que en placas viejas puede estar mal cargada
+(datos de fábrica de un módulo que nunca existió, tipo/frecuencia incorrectos).
+El SPD real del módulo (EEPROM en el DIMM, leída por SMBus/I2C) puede diferir.
+
+## Solución (workaround)
+
+Script `nwinfo-glpi-evidence.ps1` que:
+
+1. Detecta el agente GLPI instalado y genera un **inventario local** con
+   `glpi-agent --local <dir>` (sin `--server`: NO contacta ningún servidor).
+   De ahí saca los `<MEMORIES>` actuales (DESIGNATION = pkey del slot).
+2. Descarga NWinfo v1.6.6 en `C:\repositorio\workarounds\nwinfo\` (si falta) y corre
+   `nwinfo.exe --format=json --human --spd --sys`: lectura **real del SPD**.
+3. Alinea slot a slot (usa el mismo `DESIGNATION`/pkey del inventario actual) y arma
+   un XML de **contenido adicional** (`nwinfo-additional-content_<ts>.xml`, en logs/)
+   con el `<MEMORIES>` corregido (TYPE, SPEED, CAPACITY, SERIALNUMBER, MANUFACTURER).
+4. **Dry-run por defecto**: solo deja el XML + reporte comparativo local (qué decía
+   el agente vs qué dice el SPD). **NO envía nada.**
+5. Envío = paso explícito (por separado, o con `-Send`):
+   `glpi-agent.bat --force --additional-content="<ruta>.xml"`
+
+Requiere **Administrador** (descarga a `workarounds\nwinfo\` y driver de acceso SPD
+vía SMBus; si NWinfo no lee slots en una VM, no hay corrección posible: aborta avisando).
+
+## Uso
+
+Desde el menú (`menu.ps1` → `workarounds` → `nwinfo-evidence (NWinfo legacy -> GLPI)`) o directo:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\scripts\nwinfo-glpi-evidence.ps1"
+```
+
+- Dry-run (default): muestra la comparación y deja el XML en `logs\`.
+- Envío real, una de dos:
+  ```powershell
+  # opción A: un solo paso, el script corre el agente
+  powershell ... -File "C:\repositorio\workarounds\scripts\nwinfo-glpi-evidence.ps1" -Send
+  # opción B: copiar el comando que imprime el dry-run y correrlo aparte
+  "C:\Program Files\GLPI-Agent\bin\glpi-agent.bat" --force --additional-content="C:\repositorio\workarounds\logs\nwinfo-additional-content_<ts>.xml"
+  ```
+- Re-descargar NWinfo aunque exista: `-ForceRedownload`
+- Override de la carpeta del agente: `-AgentDir <ruta>`
+
+Verificación en GLPI: `Computadores → <host> → pestaña Memorias` (reemplaza la fila
+con el mismo slot/designation, no duplica; la pkey del plugin es DESIGNATION).
+
+## Qué toca y qué no
+
+| | |
+|---|---|
+| Lee | SPD real de los DIMM (SMBus, igual que CPU-Z) |
+| Crea | `workarounds\nwinfo\` (NWinfo, ignorado por git), `logs\nwinfo-*.json/html/xml`, log `logs\nwinfo-glpi-evidence_<ts>.log` |
+| Envía | **solo** con `-Send` o corriendo el comando de envío a mano; el dry-run nunca contacta el servidor |
+| Descarga | NWinfo v1.6.6 de GitHub (una vez) |
+| NO toca | GLPI server, data, credenciales, otros campos del inventario |
+
+## Deshacer
+
+El dry-run no modifica nada en GLPI. Si el envío dejó el slot mal, el próximo
+inventario normal del agente vuelve a reportar lo que diga el SMBIOS (revertir =
+borrar el `--additional-content` y dejar que corra el inventario estándar).
+
+## Referencia de origen
+
+- NWinfo: `https://github.com/a1ive/nwinfo` (v1.6.6, release del 2026-08-03).
+- GLPI Agent `--additional-content` (manpage `glpi-agent`): "Additional inventory
+  content file. This file should be an XML file, using same syntax as the one
+  produced by the agent." — mergeado en el inventario antes de enviar.
+- Formato de `<MEMORIES>` y la pkey de alineación (DESIGNATION): documentados en el
+  protocolo de inventario de FusionInventory/GLPI-Agent.
+- Caso de uso real: RREI08 (banco de la oficina), DDR3 SO-DIMM reportado por la BIOS
+  como DDR2. Verificable con el reporte CPU-Z en `C:\repositorio\banco\`.
