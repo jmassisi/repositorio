@@ -147,10 +147,11 @@ function Convert-ToMB {
     param([string]$s)
     if (-not $s) { return 0 }
     $t = "$s".Trim()
-    if ($t -match '^([\d\.\,]+)\s*GB$') { return [math]::Round([double](($matches[1] -replace ',', '.')) * 1024) }
-    if ($t -match '^([\d\.\,]+)\s*MB$') { return [math]::Round([double]($matches[1] -replace ',', '.')) }
+    $t = $t -replace ',', '.'
+    if ($t -match '^([\d\.]+)\s*GB$') { return [math]::Round([double]$matches[1] * 1024) }
+    if ($t -match '^([\d\.]+)\s*MB$') { return [math]::Round([double]$matches[1]) }
     $n = 0.0
-    if ([double]::TryParse($t -replace ',', '.', [System.Globalization.NumberStyles]::Any,
+    if ([double]::TryParse($t, [System.Globalization.NumberStyles]::Any,
             [System.Globalization.CultureInfo]::InvariantCulture, [ref]$n)) {
         if ($n -ge 1024) { return [math]::Round($n * 1024) }  # suponemos GB
         return [math]::Round($n)
