@@ -8,34 +8,40 @@
 #   1) Detecta el agente GLPI instalado y genera un INVENTARIO LOCAL con
 #      `glpi-agent --local <dir>` (sin --server: NO contacta ningun servidor,
 #      escribe el XML local). Ahi estan los <MEMORIES> que el agente reporta.
-#   2) Descarga NWinfo v1.6.6 (si no esta en workarounds\nwinfo\) y corre
-#      `nwinfo.exe --format=json --human --spd --sys` (lectura REAL del SPD
-#      por SMBus/I2C, no es lo que dice la BIOS).
-#   3) Alinea slot a slot: usa los <DESIGNATION> (pkey) del inventario actual
+#   2) Descarga NWinfo v1.6.6 (si no esta en workarounds\nwinfo\) y garantiza
+#      el driver de acceso al SPD (PawnIO): si no esta instalado lo instala
+#      silenciosamente (PawnIOSetup.exe -install -silent), si esta STOPPED lo
+#      arranca (sc start PawnIO). Disable con -SkipDriver.
+#   3) Corre `nwinfo.exe --format=json --human --spd --sys` (lectura REAL del
+#      SPD por SMBus/I2C, no es lo que dice la BIOS).
+#   4) Alinea slot a slot: usa los <DESIGNATION> (pkey) del inventario actual
 #      del agente y para cada uno arma el <MEMORIES> corregido con los datos
 #      reales del SPD (TYPE, SPEED, CAPACITY, SERIALNUMBER, MANUFACTURER).
-#   4) MODO DRY-RUN (default): genera <content>.xml + reporte comparativo
+#   5) MODO DRY-RUN (default): genera <content>.xml + reporte comparativo
 #      local. NO envia nada al servidor.
-#   5) El envio es un paso EXPLICITO (lanzar por separado), una de dos:
-#        a) con el agente local:      glpi-agent.bat --force --additional-content=<content>.xml
-#        b) con el agente instalado:  glpi-agent.bat --force --additional-content=<content>.xml
+#   6) El envio es un paso EXPLICITO (lanzar por separado), una de dos:
+#      a) con el agente local:      glpi-agent.bat --force --additional-content=<content>.xml
+#      b) con el agente instalado:  glpi-agent.bat --force --additional-content=<content>.xml
 #      (En ambos casos el agente usa su config/server instalado.)
 #
-# Requiere: Administrador (descarga a workarounds\nwinfo\ y driver de acceso
-# al SPD - PawnIO/NwHwIo, igual que CPU-Z). El dry-run deja todo en logs/.
+# Requiere: Administrador (instala el driver de acceso al SPD - PawnIO - y
+# descarga a workarounds\nwinfo\). El dry-run deja todo en logs/.
 # Reversible: nada se envia en dry-run; la correccion solo llega a GLPI si el
-# operador corre el comando de envio.
+# operador corre el comando de envio. El driver PawnIO se desinstala con
+# `PawnIOSetup.exe -uninstall -silent` (si se deja de usar este workaround).
 #
 # Uso:
 #   nwinfo-glpi-evidence.ps1                    -> dry-run (idempotente)
 #   nwinfo-glpi-evidence.ps1 -ForceRedownload   -> re-baja NWinfo aunque exista
 #   nwinfo-glpi-evidence.ps1 -AgentDir <ruta>   -> override de la carpeta del agente
+#   nwinfo-glpi-evidence.ps1 -SkipDriver        -> no toca el driver (ya gestionado aparte)
 #   nwinfo-glpi-evidence.ps1 -Send              -> corre el envio con glpi-agent
 
 #Requires -RunAsAdministrator
 param(
     [switch]$ForceRedownload,
     [string]$AgentDir = '',
+    [switch]$SkipDriver,
     [switch]$Send
 )
 $ErrorActionPreference = 'Stop'
@@ -72,6 +78,53 @@ function Get-AgentBat {
 }
 
 # ---------- NWinfo ----------
+function Test-PawnIO {
+    # Devuelve: 'RUNNING' | 'STOPPED' | 'MISSING'
+    # sc.exe query: 'ESTADO : 1  STOPPED' (es) | 'STATE : 4  RUNNING' (us)
+    $q = & sc.exe query PawnIO 2>&1 | Out-String
+    if ($q -match '(?:STATE|ESTADO)\s*:\s*\d+\s+([A-Z][A-Z_]+)') {
+        $s = $Matches[1].ToUpper()
+        if ($s -eq 'RUNNING') { return 'RUNNING' }
+        if ($s -eq 'STOPPED') { return 'STOPPED' }
+        return $s
+    }
+    if ($q -match 'does not exist|no existe|No se encontr') { return 'MISSING' }
+    return 'MISSING'
+}
+
+function Install-PawnIO {
+    $setup = Join-Path $toolDir 'PawnIOSetup.exe'
+    if (-not (Test-Path $setup)) {
+        Write-Log "No esta PawnIOSetup.exe en $toolDir (falta el driver de acceso SPD)" 'WARN'
+        return $false
+    }
+    Write-Log "Instalando driver PawnIO (acceso SPD): $setup -install -silent"
+    & $setup -install -silent
+    Start-Sleep -Seconds 2
+    $st = Test-PawnIO
+    if ($st -eq 'MISSING') {
+        Write-Log "La instalacion de PawnIO no dejo el servicio visible" 'WARN'
+        return $false
+    }
+    Write-Log "Driver PawnIO instalado (estado: $st)"
+    return $true
+}
+
+function Start-PawnIO {
+    $st = Test-PawnIO
+    if ($st -eq 'RUNNING') { Write-Log "Driver de acceso SPD (PawnIO): RUNNING" 'INFO'; return $true }
+    if ($st -eq 'MISSING') { Write-Log "Driver de acceso SPD (PawnIO) NO instalado. Instalando..." 'WARN'; return Install-PawnIO }
+    if ($st -eq 'STOPPED') {
+        Write-Log "Driver PawnIO presente pero STOPPED. Arrancando: sc start PawnIO"
+        & sc.exe start PawnIO 2>&1 | Out-Null
+        Start-Sleep -Seconds 2
+        $st2 = Test-PawnIO
+        if ($st2 -eq 'RUNNING') { Write-Log "Driver PawnIO arrancado OK" 'INFO'; return $true }
+        Write-Log "sc start PawnIO no lo paso a RUNNING (estado: $st2). NWinfo igual intentara cargarlo bajo demanda." 'WARN'
+    }
+    return $false
+}
+
 function Get-NWinfoJson {
     $exe = Join-Path $toolDir 'nwinfo.exe'
     if ($ForceRedownload -or -not (Test-Path $exe)) {
@@ -93,6 +146,12 @@ function Get-NWinfoJson {
         Write-Log "Extraido en: $toolDir"
     }
     if (-not (Test-Path $exe)) { throw "Falta nwinfo.exe en $exe" }
+    if (-not $SkipDriver) {
+        Write-Log "Garantizando driver de acceso al SPD (PawnIO)..."
+        Start-PawnIO | Out-Null
+    } else {
+        Write-Log "Driver de acceso SPD omitido (-SkipDriver)"
+    }
     $json = Join-Path $logDir "nwinfo_$ts.json"
     & $exe --format=json --human --output=$json --sys --spd
     if (-not (Test-Path $json)) { throw "NWinfo no genero el JSON: $json" }
@@ -168,7 +227,14 @@ if ($raw.PSObject.Properties.Name -contains 'SPD') {
 }
 if ($spd.Count -eq 0) {
     Write-Log "NWinfo (--spd) no encontro slots: sin acceso real al SPD no hay correccion posible." 'ERROR'
-    Write-Log "Requisitos: driver de SMBus (PawnIO/NwHwIo, como CPU-Z), Windows con admin, y no usar maquina virtual."
+    $dst = Test-PawnIO
+    Write-Log "Diagnostico: estado del driver PawnIO = $dst"
+    if ($dst -eq 'MISSING') {
+        Write-Log "El driver no quedo instalado. Reintentar SIN -SkipDriver, o instalar a mano: PawnIOSetup.exe -install -silent" 'WARN'
+    } elseif ($dst -eq 'STOPPED') {
+        Write-Log "Driver presente pero no corriendo; NWinfo deberia cargarlo bajo demanda (mismo driver que usa CPU-Z para leer SPD)." 'WARN'
+    }
+    Write-Log "Otros casos sin slots: maquina virtual (sin SMBus real), o chipset sin SMBus accesible."
     Read-Host "`nPresiona Enter para cerrar"
     exit 1
 }
