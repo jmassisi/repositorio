@@ -180,10 +180,12 @@ Script `nwinfo-glpi-evidence.ps1` que:
 3. Alinea slot a slot (usa el mismo `DESIGNATION`/pkey del inventario actual) y arma
    un XML de **contenido adicional** (`nwinfo-additional-content_<ts>.xml`, en logs/)
    con el `<MEMORIES>` corregido (TYPE, SPEED, CAPACITY, SERIALNUMBER, MANUFACTURER).
-4. **Dry-run por defecto**: solo deja el XML + reporte comparativo local (qué decía
-   el agente vs qué dice el SPD). **NO envía nada.**
-5. Envío = paso explícito (por separado, o con `-Send`):
-   `glpi-agent.bat --force --additional-content="<ruta>.xml"`
+4. **Dry-run por defecto**: muestra la comparación local (qué decía el agente vs qué
+   dice el SPD) y deja el XML + reporte en `logs/`. **NO envía nada todavía.**
+5. **Confirmación interactiva al final**: pregunta `Enviar a GLPI ahora [S/N]?`
+   (Enter = S). Solo con `S` corre el agente contra el servidor y mergea el
+   `<MEMORIES>` corregido. Con `N` queda todo local (paso explícito pendiente
+   según el comando que se imprime). `-Send` salta la pregunta y envía directo.
 
 Requiere **Administrador**. No instala servicios en el sistema: el driver de acceso
 al SPD (**NwHwIo**, del pack LITE de NWinfo) se registra y arranca a demanda por el
@@ -202,13 +204,10 @@ Desde el menú (`menu.ps1` → `workarounds` → `nwinfo-evidence (NWinfo legacy
 powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\scripts\nwinfo-glpi-evidence.ps1"
 ```
 
-- Dry-run (default): muestra la comparación y deja el XML en `logs\`.
-- Envío real, una de dos:
+- Dry-run (default): muestra la comparación y al final pregunta si enviar (`[S]/[N]`, Enter = S).
+- Envío sin pasar por la pregunta:
   ```powershell
-  # opción A: un solo paso, el script corre el agente
   powershell ... -File "C:\repositorio\workarounds\scripts\nwinfo-glpi-evidence.ps1" -Send
-  # opción B: copiar el comando que imprime el dry-run y correrlo aparte
-  "C:\Program Files\GLPI-Agent\bin\glpi-agent.bat" --force --additional-content="C:\repositorio\workarounds\logs\nwinfo-additional-content_<ts>.xml"
   ```
 - Re-descargar NWinfo aunque exista: `-ForceRedownload`
 - Override de la carpeta del agente: `-AgentDir <ruta>`
@@ -224,15 +223,15 @@ con el mismo slot/designation, no duplica; la pkey del plugin es DESIGNATION).
 | Lee | SPD real de los DIMM (SMBus, igual que CPU-Z) |
 | Instala | nada en el sistema: el driver NwHwIo (del pack LITE) se registra/arranca a demanda por `nwinfo.exe`; limpiar con `sc.exe delete NwHwIo` si quedó el servicio |
 | Crea | `workarounds\nwinfo\` (NWinfo, ignorado por git), `logs\nwinfo-*.json/html/xml`, log `logs\nwinfo-glpi-evidence_<ts>.log` |
-| Envía | **solo** con `-Send` o corriendo el comando de envío a mano; el dry-run nunca contacta el servidor |
+| Envía | **solo** respondiendo `S` a la confirmación final, con `-Send`, o corriendo el comando de envío a mano; con `N` el dry-run no contacta el servidor |
 | Descarga | NWinfo v1.6.6 (FULL + LITE) de GitHub (una vez) |
 | NO toca | GLPI server, data, credenciales, otros campos del inventario |
 
 ## Deshacer
 
-El dry-run no modifica nada en GLPI. Si el envío dejó el slot mal, el próximo
-inventario normal del agente vuelve a reportar lo que diga el SMBIOS (revertir =
-borrar el `--additional-content` y dejar que corra el inventario estándar).
+Con `N` en la confirmación no se modifica nada en GLPI. Si el envío dejó el slot mal,
+el próximo inventario normal del agente vuelve a reportar lo que diga el SMBIOS
+(revertir = borrar el `--additional-content` y dejar que corra el inventario estándar).
 
 ## Referencia de origen
 

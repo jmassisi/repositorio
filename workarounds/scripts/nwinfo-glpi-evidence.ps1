@@ -20,10 +20,11 @@
 #      reales del SPD (TYPE, SPEED, CAPACITY, SERIALNUMBER, MANUFACTURER).
 #   5) MODO DRY-RUN (default): genera <content>.xml + reporte comparativo
 #      local. NO envia nada al servidor.
-#   6) El envio es un paso EXPLICITO (lanzar por separado), una de dos:
-#      a) con el agente local:      glpi-agent.bat --force --additional-content=<content>.xml
-#      b) con el agente instalado:  glpi-agent.bat --force --additional-content=<content>.xml
-#      (En ambos casos el agente usa su config/server instalado.)
+#   6) Al final del dry-run pregunta "Enviar a GLPI ahora [S/N]? (Enter=S)".
+#      Solo responde S = corre el envio con el agente instalado
+#      (glpi-agent.bat --force --additional-content=<content>.xml, usa su
+#      config/server instalado). N = no envia; el comando para mas adelante
+#      se imprime en pantalla. -Send salta la pregunta y envia directo.
 #
 # Requiere: Administrador (descarga a workarounds\nwinfo\). No instala
 # servicios en el sistema: el driver NwHwIo se registra y arranca a demanda
@@ -163,7 +164,7 @@ function Convert-ToMB {
 Write-Host "================================================"
 Write-Host " NWinfo evidence -> GLPI  (Correccion de RAM)"
 Write-Host " Host   : $env:COMPUTERNAME"
-Write-Host " Modo   : $(if($Send){'ENVIO REAL'}else{'DRY-RUN (no envia)'})"
+Write-Host " Modo   : $(if($Send){'ENVIO REAL (sin confirmar)'}else{'DRY-RUN + confirmacion de envio al final'})"
 Write-Host "================================================"
 Write-Log "Inicio | Host: $env:COMPUTERNAME | Send: $Send"
 
@@ -314,28 +315,37 @@ $mem   </CONTENT>
 Set-Content -Path $contentFile -Value $xml -Encoding UTF8
 Write-Log "Content adicional generado: $contentFile"
 
-# F. Envio / instrucciones
-if ($Send) {
+# F. Envio al servidor (unico punto que toca GLPI)
+function Invoke-SendContent {
+    param([string]$ContentFile)
     if (-not $agentBat) {
         Write-Log "No hay glpi-agent para enviar. Abortando envio." 'ERROR'
         Read-Host "`nPresiona Enter para cerrar"
         exit 1
     }
     Write-Log "Enviando al servidor con --force --additional-content..."
-    & $agentBat --force --additional-content=$contentFile 2>&1 | Tee-Object -FilePath (Join-Path $logDir "envio_$ts.log")
-    Write-Log "Comando de envio ejecutado. Verificar en GLPI (Computadores > RREI08 > Memorias)."
+    & $agentBat --force --additional-content=$ContentFile 2>&1 | Tee-Object -FilePath (Join-Path $logDir "envio_$ts.log")
+    Write-Log "Comando de envio ejecutado. Verificar en GLPI (Computadores > $env:COMPUTERNAME > Memorias)."
+    Read-Host "`nPresiona Enter para cerrar"
+}
+
+if ($Send) {
+    Invoke-SendContent -ContentFile $contentFile
 } else {
     Write-Host "`n=================================================="
     Write-Host " CONTENT XML listo (dry-run): $contentFile"
-    Write-Host "`n PARA CORREGIR EN GLPI (paso explicito, por separado):"
-    if ($agentBat) {
-        Write-Host "  `"$agentBat`" --force --additional-content=`"$contentFile`""
-    } else {
-        Write-Host "  (sin agente detectado: instalar/configurar glpi-agent y repetir con -Send)"
-    }
-    Write-Host "`n Este dry-run NO envio nada al servidor." -ForegroundColor Green
+    Write-Host "`n Verificacion local completa (COMPARACION arriba)."
+    Write-Host " Este dry-run NO envio nada al servidor." -ForegroundColor Green
     Write-Host " Log: $logFile"
     Write-Host "=================================================="
     Write-Log "Dry-run OK. Nada fue enviado."
+    $ans = Read-Host "`nEnviar a GLPI ahora [S/N]? (Enter = S)"
+    if ($ans -match '^[sS]$' -or $ans -eq '') {
+        Write-Host "`nEnviando..." -ForegroundColor Cyan
+        Invoke-SendContent -ContentFile $contentFile
+    } else {
+        Write-Host "No enviado. Para enviar despues: `"$agentBat`" --force --additional-content=`"$contentFile`""
+        Write-Log "Envio omitido por el operador."
+        Read-Host "`nPresiona Enter para cerrar"
+    }
 }
-Read-Host "`nPresiona Enter para cerrar"
