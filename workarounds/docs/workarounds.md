@@ -174,8 +174,9 @@ Script `nwinfo-glpi-evidence.ps1` que:
 1. Detecta el agente GLPI instalado y genera un **inventario local** con
    `glpi-agent --local <dir>` (sin `--server`: NO contacta ningún servidor).
    De ahí saca los `<MEMORIES>` actuales (DESIGNATION = pkey del slot).
-2. Descarga NWinfo v1.6.6 en `C:\repositorio\workarounds\nwinfo\` (si falta) y corre
-   `nwinfo.exe --format=json --human --spd --sys`: lectura **real del SPD**.
+2. Descarga NWinfo v1.6.6 en `C:\repositorio\workarounds\nwinfo\` (si falta) — pack
+   **FULL + LITE** — y corre `nwinfo.exe --format=json --human --spd --sys`: lectura
+   **real del SPD**.
 3. Alinea slot a slot (usa el mismo `DESIGNATION`/pkey del inventario actual) y arma
    un XML de **contenido adicional** (`nwinfo-additional-content_<ts>.xml`, en logs/)
    con el `<MEMORIES>` corregido (TYPE, SPEED, CAPACITY, SERIALNUMBER, MANUFACTURER).
@@ -184,12 +185,14 @@ Script `nwinfo-glpi-evidence.ps1` que:
 5. Envío = paso explícito (por separado, o con `-Send`):
    `glpi-agent.bat --force --additional-content="<ruta>.xml"`
 
-Requiere **Administrador**. Integra el **driver de acceso al SPD** (lectura por SMBus,
-igual que CPU-Z): verifica `PawnIO` (`sc.exe query`); si falta lo instala solo con
-`PawnIOSetup.exe -install -silent` (ya viaja en el zip de NWinfo) y si está STOPPED lo
-arranca (`sc start PawnIO`). Se omite con `-SkipDriver` si ya se gestionó aparte. Si
-NWinfo no lee slots en una VM, no hay corrección posible: aborta avisando el estado del
-driver.
+Requiere **Administrador**. No instala servicios en el sistema: el driver de acceso
+al SPD (**NwHwIo**, del pack LITE de NWinfo) se registra y arranca a demanda por el
+propio `nwinfo.exe` — NWinfo lo elige automáticamente (segundo en su orden de
+drivers, antes que PawnIO) y es quien lee el SPD por scan PCI directo en chipsets
+Intel legacy (ICH6-10) donde PawnIO falla. Si `NwHwIox64.sys` no está a la vista
+junto al exe, NWinfo cae en PawnIO o en el driver de CPU-Z (si CPU-Z está abierta).
+Se omite la bajada del LITE con `-SkipDriver`. Si NWinfo no lee slots en una VM, no
+hay corrección posible: aborta avisando si falta el driver.
 
 ## Uso
 
@@ -209,7 +212,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\
   ```
 - Re-descargar NWinfo aunque exista: `-ForceRedownload`
 - Override de la carpeta del agente: `-AgentDir <ruta>`
-- No tocar el driver de SPD (si ya se gestionó con `PawnIOSetup.exe -uninstall`/`-install` a mano): `-SkipDriver`
+- No tocar el driver de SPD (no baja el LITE; usa solo PawnIO/CPU-Z si ya están): `-SkipDriver`
 
 Verificación en GLPI: `Computadores → <host> → pestaña Memorias` (reemplaza la fila
 con el mismo slot/designation, no duplica; la pkey del plugin es DESIGNATION).
@@ -219,10 +222,10 @@ con el mismo slot/designation, no duplica; la pkey del plugin es DESIGNATION).
 | | |
 |---|---|
 | Lee | SPD real de los DIMM (SMBus, igual que CPU-Z) |
-| Instala | driver PawnIO (`PawnIOSetup.exe -install -silent`) si no está — desinstalar con `-uninstall -silent` si se deja de usar |
+| Instala | nada en el sistema: el driver NwHwIo (del pack LITE) se registra/arranca a demanda por `nwinfo.exe`; limpiar con `sc.exe delete NwHwIo` si quedó el servicio |
 | Crea | `workarounds\nwinfo\` (NWinfo, ignorado por git), `logs\nwinfo-*.json/html/xml`, log `logs\nwinfo-glpi-evidence_<ts>.log` |
 | Envía | **solo** con `-Send` o corriendo el comando de envío a mano; el dry-run nunca contacta el servidor |
-| Descarga | NWinfo v1.6.6 de GitHub (una vez) |
+| Descarga | NWinfo v1.6.6 (FULL + LITE) de GitHub (una vez) |
 | NO toca | GLPI server, data, credenciales, otros campos del inventario |
 
 ## Deshacer
