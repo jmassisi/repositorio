@@ -8,6 +8,24 @@ Todos los cambios notables del toolkit. El formato sigue
 > última fecha de deploy (`C:\repositorio`). Cada entrada se agrupa por **fecha** de
 > arriba hacia abajo. Se actualiza al cerrar sesión / mergear a `main`.
 
+## [2026-09-19]
+
+### Agregado
+
+- `workarounds/copy-path-file-context-menu-w10`: agrega "Copiar ruta del archivo" al
+  menú contextual de archivos/carpetas del Explorador (Windows 10), via key
+  `HKCR\AllFilesystemObjects\shell\windows.copyaspath` (mismo efecto que el
+  `copy_path_file_context_menu_W10.reg` original). Verificación de OS (build < 22000,
+  solo W10 en es), idempotencia, log y `.reg` de undo. Rótulo en menu:
+  `copy-path-file-context-menu-w10 (Windows 10 only)`.
+
+### Cambiado
+
+- `workarounds/hide-3d-objects` renombrado a `hide-3d-objects-w10` (filenames
+  `hide-3d-objects-w10.ps1`/`hide-3d-objects-w10.cmd`, log y `.reg` de restauración
+  con el sufijo `-w10`) para reflejar en el nombre que es solo Windows 10. Rótulo en
+  menu: `hide-3d-objects-w10 (Windows 10 only)`.
+
 ## [2026-09-16]
 
 ### Agregado

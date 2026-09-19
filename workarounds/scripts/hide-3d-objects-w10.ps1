@@ -1,5 +1,5 @@
-# menu: hide-3d-objects (Windows 10 only)
-# hide-3d-objects.ps1
+# menu: hide-3d-objects-w10 (Windows 10 only)
+# hide-3d-objects-w10.ps1
 # WORKAROUND (Windows 10 / perfiles en ingles): oculta la biblioteca
 # "3D Objects" de "Este equipo" y elimina la carpeta fisica vacia de cada perfil.
 # 1) Borra la key CLSID {0DB7E03F-FC29-4DC6-9020-FF41B59E513A} del namespace
@@ -16,7 +16,7 @@ $ErrorActionPreference = 'Stop'
 $root    = Split-Path $PSScriptRoot -Parent
 $logDir  = Join-Path $root 'logs'
 $ts      = Get-Date -Format 'yyyy-MM-dd_HHmmss'
-$logFile = Join-Path $logDir "hide-3d-objects_$ts.log"
+$logFile = Join-Path $logDir "hide-3d-objects-w10_$ts.log"
 if (-not (Test-Path $logDir)) { New-Item $logDir -ItemType Directory -Force | Out-Null }
 
 function Write-Log {
@@ -121,7 +121,7 @@ foreach ($carpeta in $carpetas) {
 }
 
 # --- 6. Dejar .reg de restauracion (rollback) ---
-$restore = Join-Path $logDir "hide-3d-objects-restore_$ts.reg"
+$restore = Join-Path $logDir "hide-3d-objects-w10-restore_$ts.reg"
 $contenido = @(
     'Windows Registry Editor Version 5.00',
     '',

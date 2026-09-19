@@ -109,13 +109,13 @@ Combina dos acciones en un solo script:
 
 ## Uso
 
-Desde el menu (`menu.ps1` → `workarounds` → `hide-3d-objects (Windows 10 only)`) o directo:
+Desde el menu (`menu.ps1` → `workarounds` → `hide-3d-objects-w10 (Windows 10 only)`) o directo:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\scripts\hide-3d-objects.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\scripts\hide-3d-objects-w10.ps1"
 ```
 
-Requiere **Administrador** (borra claves en `HKLM`). El lanzador `hide-3d-objects.cmd`
+Requiere **Administrador** (borra claves en `HKLM`). El lanzador `hide-3d-objects-w10.cmd`
 eleva automaticamente si se ejecuta sin permisos.
 
 ## Comportamiento de seguridad
@@ -135,7 +135,7 @@ eleva automaticamente si se ejecuta sin permisos.
 |---|---|
 | Borra (registro) | `HKLM\...\MyComputer\NameSpace\{0DB7E03F-...}` y su `WOW6432Node` |
 | Borra (disco) | `C:\Users\*\3D Objects` **vacia** de cada perfil |
-| Genera (por corrida) | log `logs/hide-3d-objects_<ts>.log` + `.reg` de restauracion `logs/hide-3d-objects-restore_<ts>.reg` |
+| Genera (por corrida) | log `logs/hide-3d-objects-w10_<ts>.log` + `.reg` de restauracion `logs/hide-3d-objects-w10-restore_<ts>.reg` |
 | NO toca | datos del usuario con contenido, perfiles `Default`/`Public`/`All Users`, Windows 11 | 
 
 ## Deshacer
@@ -144,7 +144,7 @@ Importar el `.reg` de restauracion generado en `C:\repositorio\workarounds\logs\
 (re-crea las dos keys de registro; el icono vuelve a aparecer).
 
 ```powershell
-reg import "C:\repositorio\workarounds\logs\hide-3d-objects-restore_<ts>.reg"
+reg import "C:\repositorio\workarounds\logs\hide-3d-objects-w10-restore_<ts>.reg"
 ```
 
 ## Referencia de origen
@@ -153,6 +153,51 @@ El `Hide_3D_Objects.reg` original (de `D:\Backups\2026-01-10 - geekom...`) se ma
 en `origen/` (ignorado por git y **no se despliega al cliente**). El script implementa
 su mismo efecto via PowerShell (permite el abort por contenido, logs y verificaciones que
 un `.reg` puro no puede).
+---
+
+# WORKAROUND — "Copiar ruta del archivo" en el menú contextual (Windows 10)
+
+Agrega la opción **"Copiar ruta del archivo"** al menú contextual del Explorador para
+archivos y carpetas, a través de la key
+`HKCR\AllFilesystemObjects\shell\windows.copyaspath` (mismo efecto que el
+`copy_path_file_context_menu_W10.reg` original, referencia en `H:\Repositorio_OLD\`).
+
+> **Solo Windows 10.** En Windows 11 "Copiar como ruta" ya está integrado en el menú
+> contextual: el script detecta el OS (exige `ProductName -like 'Windows 10*'` y build
+> `< 22000`) y aborta si no aplica.
+
+## Uso
+
+Desde el menú (`menu.ps1` → `workarounds` → `copy-path-file-context-menu-w10 (Windows 10 only)`) o directo:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\scripts\copy-path-file-context-menu-w10.ps1"
+```
+
+Requiere **Administrador** (escribe en `HKCR`). El lanzador `copy-path-file-context-menu-w10.cmd`
+eleva automáticamente si se ejecuta sin permisos.
+
+## Qué toca y qué no
+
+| | |
+|---|---|
+| Crea (registro) | `HKCR\AllFilesystemObjects\shell\windows.copyaspath` con `(Default)="Copiar ruta del archivo"`, `InvokeCommandOnSelection=1`, `VerbHandler={f3d06e7c-1e45-4a26-847e-f9fcdee59be0}`, `Icon=shell32.dll,134` |
+| Genera (por corrida) | log `logs/copy-path-file-context-menu-w10_<ts>.log` + `.reg` de restauración `logs/copy-path-file-context-menu-w10-undo_<ts>.reg` |
+| NO toca | Windows 11, `HKCR\*\...` (otros verbos), otros valores del contexto |
+
+## Deshacer
+
+Importar el `.reg` de undo generado en `C:\repositorio\workarounds\logs\` (borra la key).
+
+```powershell
+reg import "C:\repositorio\workarounds\logs\copy-path-file-context-menu-w10-undo_<ts>.reg"
+```
+
+## Referencia de origen
+
+El `copy_path_file_context_menu_W10.reg` original vive en `H:\Repositorio_OLD\` (fuera del
+repo, no se despliega). El script implementa su mismo efecto vía PowerShell (verificación
+de OS, idempotencia, undo y logs que un `.reg` puro no puede).
 ---
 
 # WORKAROUND — Corrección de memoria RAM en inventario GLPI vía SPD real (NWinfo) — **DEPRECADO**
