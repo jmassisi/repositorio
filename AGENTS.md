@@ -60,3 +60,9 @@ Vive **fuera** del repo (no se despliega ni se sube):
 ## Estado conocido — legado
 
 - Workaround de alias winget **mergeado a `main`** (2026-09-09): vive ahora en `workarounds/` (ver `workarounds/docs/workarounds.md`). La decisión de su ubicación fue moverlo de `winget/scripts/` a una carpeta propia `workarounds/` para que el menú lo liste como categoría visible y no quede oculto.
+
+## Decisiones 2026-09-18 — Workaround nwinfo (SPD→GLPI) DEPRECADO
+
+- **`workarounds/scripts/deprecated/nwinfo-glpi-evidence.*`**: el workaround de corrección de memoria RAM en GLPI vía SPD real (NWinfo) quedó **DEPRECADO**. Motivo: probado en RREI08 (banco de la oficina), el reemplazo del `<MEMORIES>` con `--additional-content` **no actualiza los items existentes** de FusionInventory: alinea por DESIGNATION/seed del device y, con DESIGNATION vacía (lo que manda el agente), crea/mergea mal — resultado en RREI08: "2 DDR2 + 1 DDR3" en vez de cambiar las 2 DDR2. No tocar ni re-utilizar este código; se preserva solo como referencia.
+- **Hallazgo documentado** (en `workarounds/docs/workarounds.md`): RREI08 conserva en GLPI **2× DDR3 SO-DIMM 4 GB 1066 reportados como DDR2 800** por SMBIOS (CPU-Z + NWinfo/NwHwIo confirman el SPD real DDR3 1066, Core2 T6600 / GL40 / ICH9-M). El re-scan **sin corrección vuelve a traer DDR2** (el inventario nace del SMBIOS). Corrección real pendiente de decidir (edición manual de ficha / SQL / arreglar en BIOS) — no re-inventariar "para ver si se arregla".
+- El menú ya no lista la opción nwinfo: el `menu.ps1` barre `workarounds/scripts/` y los archivos deprecados están en `workarounds/scripts/deprecated/` (fuera del barrido).
