@@ -155,7 +155,42 @@ su mismo efecto via PowerShell (permite el abort por contenido, logs y verificac
 un `.reg` puro no puede).
 ---
 
-# WORKAROUND — Corrección de memoria RAM en inventario GLPI vía SPD real (NWinfo)
+# WORKAROUND — Corrección de memoria RAM en inventario GLPI vía SPD real (NWinfo) — **DEPRECADO**
+
+> **DEPRECADO 2026-09-18.** Este workaround se descarta: el reemplazo del `<MEMORIES>`
+> por `--additional-content` no actualiza los items existentes en GLPI (FusionInventory
+> alinea por DESIGNATION/seed del device; con DESIGNATION vacía crea/mergea mal — en
+> RREI08 quedó "2 DDR2 + 1 DDR3" en vez de reemplazar las 2 DDR2). Se mantiene el
+> código preservado en `workarounds/scripts/deprecated/nwinfo-glpi-evidence.*` (fuera
+> del menú) solo como referencia. La vía real de corrección de memoria en GLPI queda a
+> definir (opciones pendientes: edición manual de la ficha, SQL sobre la DB, o bien
+> aceptar el dato SMBIOS erróneo y corregir el SMBIOS de la BIOS).
+
+---
+
+## Hallazgo documentado — Escaneo erróneo DDR2 en lugar de DDR3 (2026-09-18)
+
+Durante la investigación de este workaround se **detectó y confirmó** el siguiente
+escaneo erróneo en el inventario GLPI de RREI08 (PC del banco de la oficina):
+
+- **GLPI reporta**: 2 memorias DDR2 4 GB (800 MHz), SO-DIMM, seriales `1234-B0` /
+  `1234-B1`, según datos `Win32_PhysicalMemory`/tabla SMBIOS 17.
+- **SPD real (leído por CPU-Z y por NWinfo vía driver NwHwIo|SMBus i801, ICH9-M)**:
+  **2 módulos DDR3 SO-DIMM 4 GB (1066 MHz)**, timings 7-7-7-20, CPU Core2 Duo
+  T6600 @ 2.20GHz, chipset GL40/ICH9-M.
+- **Conclusión**: la BIOS de esa placa carga en SMBIOS el tipo/frecuencia de un módulo
+  que no corresponde (DDR2 800) mientras el módulo físico real es DDR3 SO-DIMM 1066.
+  Los 8 GB son reales y coinciden (2×4 GB); lo erróneo es **tipo y frecuencia**
+  (DDR2 vs DDR3, 800 vs 1066), no la capacidad.
+
+**Implicación**: el inventario GLPI de RREI08 queda con tipo de memoria incorrecto
+(DDR2) hasta que se corrija por otra vía (no re-escanear sin corrección: el re-scan
+vuelve a traer DDR2 porque nace del SMBIOS). La evidencia del SPD real quedó en
+`~/reports/raw/cpuz/RREI08.txt` (reporte CPU-Z) y en los logs NWinfo de RREI08.
+
+---
+
+## (Referencia — versión original del workaround, DEPRECADA)
 
 > **Para BIOS viejas que reportan memoria mal por SMBIOS** (ej. placa de la PC de
 > banco que dice DDR2 cuando el módulo real es DDR3 SO-DIMM).
