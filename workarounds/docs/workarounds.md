@@ -200,6 +200,66 @@ repo, no se despliega). El script implementa su mismo efecto vía PowerShell (ve
 de OS, idempotencia, undo y logs que un `.reg` puro no puede).
 ---
 
+# UTILIDAD — Activación Windows con MAS (get.activated.win)
+
+Lanzador del activador **MAS** (Microsoft Activation Scripts) de MassGrave desde el menú.
+Ejecuta el oneliner oficial:
+
+```powershell
+irm https://get.activated.win | iex
+```
+
+> **Script de terceros.** MAS es un proyecto open source de MassGrave (activación por
+> HWID / Ohook / KMS38 / Online KMS). El oneliner descarga y ejecuta el script en
+> memoria: **no deja archivos locales**. Se corre bajo confirmación explícita del
+> operador: el script verifica primero si Windows ya está activado y, si lo está,
+> pregunta antes de volver a correr (idempotencia).
+
+## Uso
+
+Desde el menú (`menu.ps1` → `workarounds` → `mas-activation (Activador MAS)`) o directo:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\scripts\mas-activation.ps1"
+```
+
+Requiere **Administrador** (el `menu.cmd` ya eleva). El lanzador
+`mas-activation.cmd` eleva automáticamente si se ejecuta sin permisos.
+
+Flujo del script:
+
+1. Verifica el estado de activación actual (`SoftwareLicensingProduct`) y lo muestra.
+2. Si ya está activado, pregunta `Correr MAS de todos modos? (S/N)`; con `N` cierra sin tocar nada.
+3. Confirma la descarga de código de terceros (`Ejecutar ahora? S/N`).
+4. Ejecuta `irm https://get.activated.win | iex` (abre el menú interactivo de MAS).
+5. Al volver, re-verifica la activación, deja el log y sugiere `slmgr /xpr` / `slmgr /dli`.
+
+## Qué toca y qué no
+
+| | |
+|---|---|
+| Descarga/ejecuta | script MAS remoto (en memoria, sin archivos locales) |
+| Genera (por corrida) | log `logs/mas-activation_<ts>.log` |
+| No deja | binarios, servicios ni instalaciones propias en el equipo |
+| Requiere | Administrador y conexión a internet |
+
+> El propio MAS puede dejar su activación (HWID/Ohook/KMS) y, en algunos modos,
+> registrar servicios/planificación propios según la opción elegida en su menú.
+
+## Verificación
+
+```powershell
+slmgr /xpr
+slmgr /dli
+```
+
+## Referencias
+
+- Repo: `https://github.com/massgravel/Microsoft-Activation-Scripts`
+- Web oficial: `https://massgrave.dev` (mirror del oneliner: `https://get.activated.win`)
+
+---
+
 # WORKAROUND — Corrección de memoria RAM en inventario GLPI vía SPD real (NWinfo) — **DEPRECADO**
 
 > **DEPRECADO 2026-09-18.** Este workaround se descarta: el reemplazo del `<MEMORIES>`
