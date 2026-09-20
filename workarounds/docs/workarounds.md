@@ -203,7 +203,7 @@ de OS, idempotencia, undo y logs que un `.reg` puro no puede).
 # UTILIDAD — Activación Windows con MAS (get.activated.win)
 
 Lanzador del activador **MAS** (Microsoft Activation Scripts) de MassGrave desde el menú.
-Ejecuta el oneliner oficial:
+Solo ejecuta el oneliner oficial (sin verificación previa ni lógica extra):
 
 ```powershell
 irm https://get.activated.win | iex
@@ -211,9 +211,7 @@ irm https://get.activated.win | iex
 
 > **Script de terceros.** MAS es un proyecto open source de MassGrave (activación por
 > HWID / Ohook / KMS38 / Online KMS). El oneliner descarga y ejecuta el script en
-> memoria: **no deja archivos locales**. Se corre bajo confirmación explícita del
-> operador: el script verifica primero si Windows ya está activado y, si lo está,
-> pregunta antes de volver a correr (idempotencia).
+> memoria y abre su menú interactivo en esta consola.
 
 ## Uso
 
@@ -226,20 +224,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\
 Requiere **Administrador** (el `menu.cmd` ya eleva). El lanzador
 `mas-activation.cmd` eleva automáticamente si se ejecuta sin permisos.
 
-Flujo del script:
-
-1. Verifica el estado de activación actual (`SoftwareLicensingProduct`) y lo muestra.
-2. Si ya está activado, pregunta `Correr MAS de todos modos? (S/N)`; con `N` cierra sin tocar nada.
-3. Confirma la descarga de código de terceros (`Ejecutar ahora? S/N`).
-4. Ejecuta `irm https://get.activated.win | iex` (abre el menú interactivo de MAS).
-5. Al volver, re-verifica la activación, deja el log y sugiere `slmgr /xpr` / `slmgr /dli`.
-
 ## Qué toca y qué no
 
 | | |
 |---|---|
-| Descarga/ejecuta | script MAS remoto (en memoria, sin archivos locales) |
-| Genera (por corrida) | log `logs/mas-activation_<ts>.log` |
+| Ejecuta | `irm https://get.activated.win | iex` (menú interactivo de MAS) |
 | No deja | binarios, servicios ni instalaciones propias en el equipo |
 | Requiere | Administrador y conexión a internet |
 
