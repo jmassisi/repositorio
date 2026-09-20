@@ -8,6 +8,18 @@ Todos los cambios notables del toolkit. El formato sigue
 > última fecha de deploy (`C:\repositorio`). Cada entrada se agrupa por **fecha** de
 > arriba hacia abajo. Se actualiza al cerrar sesión / mergear a `main`.
 
+## [2026-09-20]
+
+### Agregado
+
+- `workarounds/mas-activation`: ejecuta el activador MAS (MassGrave) vía el oneliner
+  `irm https://get.activated.win | iex` desde el menú. Verifica el estado de activación
+  previo (idempotencia, pregunta antes de correr si ya está activado), confirma la
+  descarga de código de terceros, re-verifica al final y deja log en
+  `workarounds/logs/mas-activation_<ts>.log`. Rótulo en menu:
+  `mas-activation (Activador MAS)`. Referencias en doc: repo
+  github.com/massgravel/Microsoft-Activation-Scripts y web massgrave.dev.
+
 ## [2026-09-19]
 
 ### Agregado
