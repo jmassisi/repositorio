@@ -15,7 +15,7 @@
   { "nombre": "Mozilla Firefox (es-AR)",                 "id": "Mozilla.Firefox.es-AR",                  "args": "" },
   { "nombre": "Node.js LTS",                             "id": "OpenJS.NodeJS.LTS",                      "args": "" },
   { "nombre": "Notepad++",                               "id": "Notepad++.Notepad++",                    "args": "" },
-  { "nombre": "OBS Studio",                              "id": "OBSProject.OBSSstudio",                  "args": "" },
+  { "nombre": "OBS Studio",                              "id": "OBSProject.OBSStudio",                   "args": "" },
   { "nombre": "pnpm",                                    "id": "pnpm.pnpm",                              "args": "" },
   { "nombre": "Python 3.12",                             "id": "Python.Python.3.12",                     "args": "" },
   { "nombre": "rclone",                                  "id": "Rclone.Rclone",                          "args": "" },

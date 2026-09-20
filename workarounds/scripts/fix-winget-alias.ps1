@@ -2,7 +2,9 @@
 # WORKAROUND: repara el comando winget cuando el alias de WindowsApps esta roto.
 # NO toca el sistema: crea un shim (winget.cmd) en %USERPROFILE%\bin y agrega
 # esa carpeta al PATH de usuario. No requiere admin.
-# Requiere: PowerShell 7 (pwsh).
+# Requiere: PowerShell 7 (pwsh) en el equipo SOLO como dependencia del shim
+# generado (winget.cmd resuelve el motor con pwsh). El propio script corre
+# tambien bajo Windows PowerShell 5.1 (desde el menu) sin adaptarse a JSON.
 # Reversible: ver workarounds/docs/workarounds.md (seccion "Deshacer").
 
 $ErrorActionPreference = 'Stop'

@@ -24,12 +24,12 @@ Se descarga en `C:\repositorio`, limpia rastros al finalizar y abre la carpeta.
 
 ## Gestión
 
-**Verificar actualizaciones** (`check.ps1`)  
-Compara la fecha local de `C:\repositorio` contra el último commit en GitHub. Si hay cambios disponibles, ofrece actualizar en el momento con `[A]` o salir con `[Enter]`.
+**Verificar actualizaciones**  
+Al abrir el menú (`menu.cmd` / `menu.ps1`) se compara la fecha local de `C:\repositorio` contra el último commit en GitHub. Si hay cambios disponibles, ofrece actualizar en el momento con `[A]` o salir con `[Enter]`.
 
 ```powershell
 # Ejecutar desde C:\repositorio
-.\check.ps1
+.\menu.cmd
 ```
 
 **Historial de cambios**  
@@ -50,13 +50,13 @@ irm repositorio.igeek.ar | iex
 | `defprof/` | Perfil por defecto con DefProf | [defprof.md](defprof/docs/defprof.md) |
 | `glpi/` | Agente y script de instalación | [glpi-agent.md](glpi/docs/glpi-agent.md) |
 | `office/` | Instalación desatendida de Office | [office.md](office/docs/office.md) |
-| `scripts/sistema` | Scripts de optimización y configuración del sistema | — |
-| `scripts/drivers` | Backup y restauración de drivers | — |
+| `scripts/sistema` | Scripts de optimización y configuración del sistema *(carpeta vacía — pendiente)* | — |
+| `scripts/drivers` | Backup y restauración de drivers *(carpeta vacía — pendiente)* | — |
 | `sysinternals/` | Herramientas de Sysinternals (autologon) | — |
 | `winget/` | Instalación de aplicaciones vía Winget desde lista | [winget.md](winget/docs/winget.md) |
 | `workarounds/` | Workarounds puntuales (fix de alias winget, "Copiar ruta del archivo", ocultar 3D Objects, etc.) | [workarounds.md](workarounds/docs/workarounds.md) |
 | `zabbix/` | Agente y configuración de monitoreo | — |
-| `registro/` | Tweaks de registro (.reg) | — |
+| `registro/` | Tweaks de registro (.reg) *(carpeta vacía — pendiente)* | — |
 
 ---
 

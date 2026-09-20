@@ -19,7 +19,7 @@ Cada utilidad vive en su propia carpeta con la misma forma:
 └── scripts/         ← <script-principal>.ps1 + <script-principal>.cmd
 ```
 
-Elementos existentes: `anydesk`, `defprof`, `glpi`, `office`, `sysinternals`, `winget`, `zabbix`, `registro` (tweaks .reg), `scripts/sistema`, `scripts/drivers`.
+Elementos existentes: `anydesk`, `defprof`, `glpi`, `office`, `sysinternals`, `winget`, `workarounds`, `zabbix` (en progreso). Solo estructura (carpetas vacías, pendientes de contenido): `registro` (tweaks .reg), `scripts/sistema`, `scripts/drivers`.
 
 ## Convenciones
 
@@ -49,8 +49,8 @@ Elementos existentes: `anydesk`, `defprof`, `glpi`, `office`, `sysinternals`, `w
 ## Despliegue en cliente
 
 - `irm repositorio.igeek.ar | iex` → descarga zip de GitHub → despliega en `C:\repositorio` (raíz, sin `.git`).
-- `repositorio.ps1` limpia en el cliente: `.gitignore`, `PENDIENTES.md`. Mantener eso en mente al agregar archivos raíz.
-- La verificación de "¿está al día?" es `check.ps1` comparando contra el último commit de GitHub.
+- `repositorio.ps1` limpia en el cliente: `.gitignore`, `PENDIENTES.md`, `AGENTS.md`. Mantener eso en mente al agregar archivos raíz.
+- La verificación de "¿está al día?" es la comparación Local/GitHub integrada en `menu.ps1` (con la opción `[A]` Actualizar) y en `repositorio.ps1 -Actualizar`.
 
 ## Documentación de gestión
 

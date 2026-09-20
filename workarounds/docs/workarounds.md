@@ -40,6 +40,11 @@ Aplicar con un solo comando (no requiere admin):
 pwsh -NoProfile -File "C:\repositorio\workarounds\scripts\fix-winget-alias.ps1"
 ```
 
+> Desde el menú del repositorio, el script también se ejecuta con **Windows
+> PowerShell 5.1** (menu.ps1) y funciona: no parsea JSON. El único punto que
+> depende de **pwsh** es el shim generado (`winget.cmd`), que resuelve la
+> ubicación del motor con pwsh en runtime.
+
 Verificación (en terminal **nueva**, el PATH no se refresca en la abierta):
 
 ```powershell
@@ -87,7 +92,7 @@ Aplica el workaround primero (rapido, reversible) y deja el fix real como opcion
 
 ## Versiones/contexto validado
 
-- El shim y `fix-winget-alias.ps1` se aplican con **pwsh** (PowerShell 7), que es la shell personal del usuario. Con 5.1 el parseo de JSON rompe en silencio; por eso ese script usa `-Raw` + normalización a array (ver `winget.ps1`).
+- El script `fix-winget-alias.ps1` corre bajo **Windows PowerShell 5.1** (desde el menú) y bajo **pwsh** (comando de consola de arriba): no parsea JSON. El shim `winget.cmd` que genera requiere **pwsh** en runtime para resolver el path del motor (ver header del script).
 - Motor winget v1.29.290 validado funcionando con este workaround.
 - **Decisión 2026-09-09:** los lanzadores `.cmd` del repo se mantienen en Windows PowerShell 5.1 (no se migra a pwsh).
 
