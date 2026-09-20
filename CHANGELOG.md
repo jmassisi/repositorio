@@ -16,6 +16,13 @@ Todos los cambios notables del toolkit. El formato sigue
   MAS (MassGrave): `irm https://get.activated.win | iex` (abre su menú interactivo). Sin
   lógica extra ni logs. Rótulo en menu: `mas-activation (Activador MAS)`. Referencias en
   doc: repo github.com/massgravel/Microsoft-Activation-Scripts y web massgrave.dev.
+- `workarounds/keyboard-leds`: instalador **Keyboard LEDs 2.7.1.59** (KARPOLAN, último
+  release) versionado en `workarounds/bin/keyboard-leds-2.7.1.59.exe` + script
+  `keyboard-leds-install.ps1/.cmd` que instala silenciosamente (`/S`, NSIS) con
+  idempotencia (detecta instalación previa), verificación final y log. El canal oficial
+  de descarga está muerto (404), por eso el binario viaja en el repo con su SHA-256
+  documentado. Rótulo en menu: `keyboard-leds-install (Instalar Keyboard LEDs)`.
+  Referencias en doc: karpolan.com, Wayback, Software Informer (AV limpio) y mirrors.
 
 ## [2026-09-19]
 
