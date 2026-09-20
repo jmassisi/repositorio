@@ -249,6 +249,75 @@ slmgr /dli
 
 ---
 
+# UTILIDAD — Keyboard LEDs 2.7.1.59 (installer local en el repo)
+
+Instalador de **Keyboard LEDs** (KARPOLAN/Anton Karpenko) — muestra el estado de
+Caps/Num/Scroll Lock en pantalla/bandeja. Ideal para notebooks y teclados inalámbricos
+sin LEDs. **2.7.1.59 es el último release** (2014) y el canal oficial está muerto
+(`keyboard-leds.com/download/` y `/files/keyboard-leds.exe` devuelven 404), así que el
+instalador original (NSIS, firmado) **viaja versionado en `workarounds/bin/`** para no
+depender de mirrors que puedan desaparecer.
+
+## Uso
+
+Desde el menú (`menu.ps1` → `workarounds` → `keyboard-leds-install (Instalar Keyboard LEDs)`) o directo:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\repositorio\workarounds\scripts\keyboard-leds-install.ps1"
+```
+
+Requiere **Administrador** (el `menu.cmd` ya eleva). El lanzador
+`keyboard-leds-install.cmd` eleva automáticamente si se ejecuta sin permisos.
+
+Flujo del script:
+
+1. Verifica que exista el instalador local `workarounds/bin/keyboard-leds-2.7.1.59.exe`.
+2. Detecta instalación previa (exe por defecto o entrada de *Panel de control → Programas*);
+   si ya está, pregunta `Re-instalar de todos modos? (S/N)`.
+3. Cierra el proceso `KeyboardLeds` si está en ejecución.
+4. Instala silenciosamente: `keyboard-leds-2.7.1.59.exe /S` (instalador **NSIS**).
+5. Verifica el exe instalado y deja registro en
+   `logs/keyboard-leds-install_<ts>.log` junto al SHA-256 del instalador.
+
+## Qué toca y qué no
+
+| | |
+|---|---|
+| Instala | Keyboard LEDs 2.7.1.59 (ruta por defecto del instalador NSIS) |
+| Crea (en el repo) | `workarounds/bin/keyboard-leds-2.7.1.59.exe` (522.508 bytes) |
+| Genera (por corrida) | log `logs/keyboard-leds-install_<ts>.log` |
+| NO toca | registro salvo lo que hace el propio instalador, config de usuario |
+
+## Deshacer
+
+Desinstalar desde *Panel de control → Programas → Keyboard LEDs* o, si se quiere
+reproducir la versión, volver a correr el instalador del repo.
+
+## Integridad
+
+SHA-256 del instalador versionado:
+
+```
+4b2e12eea8116f0670919dc0b782019776dbec09614e821132636679421c50f5
+```
+
+Coincide con el instalador original firmado por KARPOLAN (copia recuperada del Wayback
+Machine) y con el que reporta el mirror LO4D (522.508 bytes).
+
+## Referencias
+
+- Autor (página viva, descarga muerta): `https://software.karpolan.com/keyboard-leds/`
+- Official (404): `https://keyboard-leds.com` / `https://keyboard-leds.com/download/`
+- Wayback del original: `https://web.archive.org/web/*/keyboard-leds.com/files/keyboard-leds.exe`
+- Software Informer (v2.7.1.59, `keyboard-leds.zip`, escaneado por 76 AV — limpio, 2025-01-09):
+  `https://keyboard-leds.software.informer.com/download/`
+- Mirrors adicionales: LO4D `https://keyboard-leds.en.lo4d.com/windows`, CNET
+  `https://download.cnet.com/keyboard-leds/3000-2094_4-75219806.html`, Softpedia
+  `https://www.softpedia.com/get/System/System-Miscellaneous/Keyboard-Leds.shtml`,
+  SoftDeluxe `https://softdeluxe.com/Keyboard-Leds-1674842/`
+
+---
+
 # WORKAROUND — Corrección de memoria RAM en inventario GLPI vía SPD real (NWinfo) — **DEPRECADO**
 
 > **DEPRECADO 2026-09-18.** Este workaround se descarta: el reemplazo del `<MEMORIES>`
