@@ -24,6 +24,19 @@ Todos los cambios notables del toolkit. El formato sigue
   documentado. Rótulo en menu: `keyboard-leds-install (Instalar Keyboard LEDs)`.
   Referencias en doc: karpolan.com, Wayback, Software Informer (AV limpio) y mirrors.
 
+### Corregido
+
+- Inconsistencias de documentación: eliminada la referencia al inexistente `check.ps1`
+  (la verificación Local/GitHub vive en `menu.ps1` con `[A]` Actualizar y en
+  `repositorio.ps1 -Actualizar`); `registro/`, `scripts/sistema` y `scripts/drivers`
+  marcadas como carpetas vacías/pendientes; `repositorio.ps1` también limpia
+  `AGENTS.md` en el deploy. Referencia: tag `inconsistencias-doc-apps-v1`.
+- `apps.json`: typo `OBSProject.OBSSstudio` → `OBSProject.OBSStudio` (el ID real de
+  winget; el typo impedía instalar OBS Studio desde la lista).
+- `workarounds/fix-winget-alias`: aclarado el contexto de shells — el script corre
+  bajo PowerShell 5.1 (menú) y pwsh (consola); solo el shim `winget.cmd` generado
+  requiere pwsh en runtime.
+
 ## [2026-09-19]
 
 ### Agregado
