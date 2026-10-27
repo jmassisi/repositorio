@@ -8,6 +8,15 @@ Todos los cambios notables del toolkit. El formato sigue
 > última fecha de deploy (`C:\repositorio`). Cada entrada se agrupa por **fecha** de
 > arriba hacia abajo. Se actualiza al cerrar sesión / mergear a `main`.
 
+## [2026-10-27]
+
+### Agregado
+
+- `iso-windows/docs/iso-windows-11-26h2.md`: instructivo v3.0.0 para generar la ISO
+  de Windows 11 26H2 multiedición (Pro, Enterprise, IoT Enterprise) y desatendida con
+  UUP dump, `ei.cfg`, `autounattend.xml`, modo auditoría y `sysprep_oobe.xml`. Solo
+  documentación: no incluye scripts ni los XML/CFG que el instructivo entrega aparte.
+
 ## [2026-09-20]
 
 ### Agregado

@@ -19,7 +19,7 @@ Cada utilidad vive en su propia carpeta con la misma forma:
 └── scripts/         ← <script-principal>.ps1 + <script-principal>.cmd
 ```
 
-Elementos existentes: `anydesk`, `defprof`, `glpi`, `office`, `sysinternals`, `winget`, `workarounds`, `zabbix` (en progreso). Solo estructura (carpetas vacías, pendientes de contenido): `registro` (tweaks .reg), `scripts/sistema`, `scripts/drivers`.
+Elementos existentes: `anydesk`, `defprof`, `glpi`, `office`, `sysinternals`, `winget`, `workarounds`, `zabbix` (en progreso), `iso-windows` (solo documentación, sin scripts). Solo estructura (carpetas vacías, pendientes de contenido): `registro` (tweaks .reg), `scripts/sistema`, `scripts/drivers`.
 
 ## Convenciones
 
