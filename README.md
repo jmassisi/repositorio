@@ -17,6 +17,7 @@ Se descarga en `C:\repositorio`, limpia rastros al finalizar y abre la carpeta.
 - **AnyDesk Reset** — Resetea ID y configuración
 - **DefProf** — Despliega y actualiza el perfil por defecto de Windows
 - **GLPI Agent** — Instalación y forzado de inventario
+- **ISO Windows** — Instructivo para generar una ISO de Windows 11 26H2 multiedición y desatendida ([ver](iso-windows/docs/iso-windows-11-26h2.md))
 - **Office Install** — Instalación desatendida de Office
 - **Sysinternals** — Herramientas de Sysinternals (Autologon)
 - **Winget** — Instalación de aplicaciones vía Winget desde una lista (selección múltiple)
@@ -49,6 +50,7 @@ irm repositorio.igeek.ar | iex
 | `anydesk/` | Reset de ID y configuración de AnyDesk | [anydesk.md](anydesk/docs/anydesk.md) |
 | `defprof/` | Perfil por defecto con DefProf | [defprof.md](defprof/docs/defprof.md) |
 | `glpi/` | Agente y script de instalación | [glpi-agent.md](glpi/docs/glpi-agent.md) |
+| `iso-windows/` | Instructivo para generar ISO de Windows 11 26H2 (multiedición y desatendida) | [iso-windows-11-26h2.md](iso-windows/docs/iso-windows-11-26h2.md) |
 | `office/` | Instalación desatendida de Office | [office.md](office/docs/office.md) |
 | `scripts/sistema` | Scripts de optimización y configuración del sistema *(carpeta vacía — pendiente)* | — |
 | `scripts/drivers` | Backup y restauración de drivers *(carpeta vacía — pendiente)* | — |
