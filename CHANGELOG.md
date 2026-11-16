@@ -8,6 +8,19 @@ Todos los cambios notables del toolkit. El formato sigue
 > última fecha de deploy (`C:\repositorio`). Cada entrada se agrupa por **fecha** de
 > arriba hacia abajo. Se actualiza al cerrar sesión / mergear a `main`.
 
+## [2026-11-16]
+
+### Agregado
+
+- `winget/docs/apps-winget-install-list.md`: lista de aplicaciones para instalación con
+  Winget (un comando por app, en bloques individuales para copia rápida en GitHub), con
+  sección guía al final para revisar nuevas apps antes de ordenarlas alfabéticamente.
+
+### Cambiado
+
+- `README.md`: en la tabla "Estructura", fila `winget/`, se agrega una segunda línea con
+  el link directo a la [lista de apps](winget/docs/apps-winget-install-list.md).
+
 ## [2026-10-27]
 
 ### Agregado
