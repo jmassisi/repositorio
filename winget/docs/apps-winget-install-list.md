@@ -1,3 +1,4 @@
+```text
 winget install -e --id 7zip.7zip --silent --accept-package-agreements --accept-source-agreements
 winget install -e --id Adobe.Acrobat.Reader.64-bit --silent --accept-package-agreements --accept-source-agreements
 winget install -e --id Anomaly.OpenCode --silent --accept-package-agreements --accept-source-agreements
@@ -41,3 +42,4 @@ winget install -e --id VideoLAN.VLC --silent --accept-package-agreements --accep
 
 -------
 
+```
